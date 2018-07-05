@@ -32,7 +32,7 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
     int mEditMode = 0;
     private static String TAG = "MusicAdapterPlus";
     static class ViewHolder extends RecyclerView.ViewHolder{
-        View musicView;
+        //View musicView;
         TextView txtMusicName;
         Button btnMusicDelete;
         CheckBox ckChoose;
@@ -41,7 +41,7 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
 
         public ViewHolder(View view){
             super(view);
-            musicView = view;
+            //musicView = view;
             txtMusicName = view.findViewById(R.id.music_name);
             btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
             ckChoose = view.findViewById(R.id.ckChoose);
@@ -61,21 +61,32 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.music_item,parent,false);
         final ViewHolder holder = new ViewHolder(view);
 
+
+
         holder.txtMusicName.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                int position = holder.getAdapterPosition();
-                Music music = mMusicList.get(position);
-                String name = music.getName();
-                String path = music.getPath();
-                Context context = v.getContext();
-                Intent intent = new Intent();
-                intent.putExtra("extra_name",name);
-                intent.putExtra("extra_path",path);
-                intent.putExtra("extra_position",String.valueOf(position));
-                intent.setClass(context,PlayerViewActivity.class);
+                if(MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE){
+                    int position = holder.getAdapterPosition();
+                    Music music = mMusicList.get(position);
+                    String name = music.getName();
+                    String path = music.getPath();
+                    Context context = v.getContext();
+                    Intent intent = new Intent();
+                    intent.putExtra("extra_name",name);
+                    intent.putExtra("extra_path",path);
+                    intent.putExtra("extra_position",String.valueOf(position));
+                    intent.setClass(context,PlayerViewActivity.class);
 
-                context.startActivity(intent);
+                    context.startActivity(intent);
+                }else{
+                    if(holder.ckChoose.isChecked()){
+                        holder.ckChoose.setChecked(false);
 
+                    }else{
+                        holder.ckChoose.setChecked(true);
+
+                    }
+                }
             }
         });
 
@@ -110,14 +121,17 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
             }
         });
 
+        //当多选框
         holder.ckChoose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 int position = holder.getAdapterPosition();
                 if(compoundButton.isChecked()){
                     mMusicList.get(position).setSelect(true);
+                    //Music.selectNum++;
                 }else{
                     mMusicList.get(position).setSelect(false);
+                    //Music.selectNum--;
                 }
 
 
@@ -127,12 +141,12 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
         return holder;
     }
 
-
+//交互的关键所在
     public void onBindViewHolder(ViewHolder holder,int position){
         Music music = mMusicList.get(position);
         holder.txtMusicName.setText(music.getName());
 
-        //这里必须匹配？？？？
+        //
         if(mMusicList.get(position).isSelect()){
             holder.ckChoose.setChecked(true);
         }else{

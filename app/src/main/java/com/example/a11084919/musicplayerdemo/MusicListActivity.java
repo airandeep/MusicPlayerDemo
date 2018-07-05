@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +45,13 @@ public class MusicListActivity extends AppCompatActivity {
     private static String TAG = "MusicListActivity";
     private Button btnManage;
     private MusicAdapterPlus adapterPlus;
+    private LinearLayout LinOutButton;
+    private Button btnChooseAll;
+    private Button btnDelete;
+
+    public static final int STATE_PLAY_ENABLE = 0;
+    public static final int STATE_MANAGE = 1;
+    public static int stateNow;
 
 
     @Override
@@ -68,13 +76,50 @@ public class MusicListActivity extends AppCompatActivity {
         }
 
         btnManage = findViewById(R.id.btnManage);
+        LinOutButton = findViewById(R.id.LinOutButton);
+        btnChooseAll = findViewById(R.id.btnChooseAll);
+        btnDelete = findViewById(R.id.btnDelete);
+
         btnManage.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                String flag = btnManage.getText().toString();
-                if(flag.equals("管理")){
-                    btnManage.setText("完成");
-                    adapterPlus.setEditMode(1);
+                btnManage.setVisibility(View.GONE);
+                LinOutButton.setVisibility(View.VISIBLE);
+                adapterPlus.setEditMode(1);
+                stateNow = STATE_MANAGE;
+                //Music.selectNum = 0;
+            }
+        });
+
+        btnChooseAll.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                int n = Music.musicList.size();
+                String flag = btnChooseAll.getText().toString();
+                if(flag.equals("全选")){
+                    for(int i = 0;i < n;i++){
+                        Music.musicList.get(i).setSelect(true);
+                    }
+                    btnChooseAll.setText("全不选");
                 }else{
+                    for(int i = 0;i < n;i++){
+                        Music.musicList.get(i).setSelect(false);
+                    }
+                    btnChooseAll.setText("全选");
+                }
+                adapterPlus.notifyDataSetChanged();
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                boolean flag = false;
+                int n = Music.musicList.size();
+                for(int i = 0;i < n;i++){
+                    if(Music.musicList.get(i).isSelect()){
+                        flag = true;
+                        break;
+                    }
+                }
+                if(flag){
                     final AlertDialog dialog = new AlertDialog.Builder(MusicListActivity.this).create();
                     dialog.show();
                     dialog.getWindow().setContentView(R.layout.pop_user);
@@ -82,6 +127,15 @@ public class MusicListActivity extends AppCompatActivity {
                     Button cancel = dialog.findViewById(R.id.btn_cancle);
                     Button sure = dialog.findViewById(R.id.btn_sure);
                     if (msg == null || cancel == null || sure == null) return;
+
+                    int num = 0;
+                    for(int i = 0;i<n;i++){
+                        if(Music.musicList.get(i).isSelect()){
+                            num++;
+                        }
+                    }
+                    msg.setText("确定要删除选中的"+num+"首歌曲么?");
+
                     cancel.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View v){
                             dialog.dismiss();
@@ -89,7 +143,7 @@ public class MusicListActivity extends AppCompatActivity {
                     });
 
                     sure.setOnClickListener(new View.OnClickListener(){
-                        public void onClick(View v){
+                        public void onClick(View view){
                             for(int i = adapterPlus.getMyMusicList().size()-1;i>=0;i--){
                                 Music music = adapterPlus.getMyMusicList().get(i);
                                 if(music.isSelect()){
@@ -99,35 +153,35 @@ public class MusicListActivity extends AppCompatActivity {
                             }
                             adapterPlus.notifyDataSetChanged();
 
-                            btnManage.setText("管理");
-                            adapterPlus.setEditMode(0);
+                            //adapterPlus.setEditMode(1);
                             dialog.dismiss();
+                            Toast.makeText(view.getContext(),"删除成功",Toast.LENGTH_SHORT).show();
                         }
                     });
 
-
+                }else{
+                    Toast.makeText(view.getContext(),"请选中歌曲",Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
 
+
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.main,menu);
-        return true;
-    }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                if(stateNow == STATE_MANAGE){
+                    btnManage.setVisibility(View.VISIBLE);
+                    LinOutButton.setVisibility(View.GONE);
+                    adapterPlus.setEditMode(0);
+                    stateNow = STATE_PLAY_ENABLE;
+                }else{
+                    finish();
+                }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.add_item:
-                Toast.makeText(this,"你点击了增加",Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.remove_item:
-                Toast.makeText(this,"你点击了减少",Toast.LENGTH_SHORT).show();
                 break;
                 default:
                     break;
@@ -136,11 +190,10 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
 
+
     //在获取权限后判断的2个分支中均执行此方法刷新播放列表
     private void showMusicList(File[] files){
         getFileMusicData(files);
-//        adapter = new MusicAdapter(this,R.layout.music_item,Music.musicList);
-//        musicListView.setAdapter(adapter);
 
         RecyclerView recyclerView = findViewById(R.id.musicRecycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -157,7 +210,7 @@ public class MusicListActivity extends AppCompatActivity {
                     getFileMusicData(file.listFiles());
                 }else{
                     String fileName = file.getName();
-                    if(fileName.endsWith(".mp3") || fileName.endsWith(".flac")){
+                    if(fileName.endsWith(".mp3") || fileName.endsWith(".flac") || fileName.endsWith(".txt")){
                         //Log.d(TAG, "音乐名字为:"+fileName);
                         String s = fileName.substring(0,fileName.lastIndexOf(".")).toString();
                         Music temp = new Music(s,file.toString());

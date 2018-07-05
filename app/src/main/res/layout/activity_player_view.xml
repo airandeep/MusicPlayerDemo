@@ -11,22 +11,25 @@
         android:id="@+id/txtMusic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
+        android:singleLine="true"
+
         android:layout_gravity="center_horizontal"
         android:text="dgdgfgdgsdfgdfgdfhfghgfhfghfhgfhgfghfdfg"
         android:textSize="28dp"
-        android:singleLine="true"
+
         />
     <RelativeLayout
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-        <ImageView
-
+        <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/test"

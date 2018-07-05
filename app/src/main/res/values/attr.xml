@@ -4,4 +4,6 @@
     <declare-styleable name="customTextView">
         <attr name="duration" />
     </declare-styleable>
+
+
 </resources>

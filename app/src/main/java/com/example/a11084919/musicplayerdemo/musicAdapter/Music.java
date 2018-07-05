@@ -7,6 +7,7 @@ import java.util.List;
 public class Music {
 
     public static List<Music>  musicList = new ArrayList<>();
+    public static int selectNum = 0;
 
     private String name;
     private String path;
@@ -40,4 +41,5 @@ public class Music {
     public void setSelect(boolean isSelect) {
         this.isSelect = isSelect;
     }
+
 }

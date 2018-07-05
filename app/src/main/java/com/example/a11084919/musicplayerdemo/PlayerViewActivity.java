@@ -1,6 +1,7 @@
 package com.example.a11084919.musicplayerdemo;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.Handler;
@@ -9,10 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.a11084919.musicplayerdemo.functivity.Functivity;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 
 import java.io.File;
@@ -21,16 +24,23 @@ import static java.lang.Thread.sleep;
 
 public class PlayerViewActivity extends AppCompatActivity {
 
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    //MediaPlayer实例化的对象必须手动mediaPlayer.stop(); mediaPlayer.release();释放，即使当前活动
+    ////
+    private static MediaPlayer mediaPlayer = new MediaPlayer();
+    private static boolean flagMedia = false;
+
     private TextView txtMusic;
     private SeekBar SBMusicInfo;
     private TextView txtTimeNow;
     private TextView txtTimeMax;
-    private ProgressBar proMusicInfo;
+
     private Button btnPlay;
     private Button btnPause;
     private Button btnPre;
     private Button btnNext;
+    private ImageView imgShow;
+    Bitmap bmpMp3;
+
 
     private boolean flag;
 
@@ -54,7 +64,9 @@ public class PlayerViewActivity extends AppCompatActivity {
                             String str = String.format("%02d:%02d", timeTemp / 60 % 60, timeTemp % 60);
                             txtTimeNow.setText(str);
                             SBMusicInfo.setProgress(max*position/time);
-
+                            if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
+                                nextSong();
+                            }
                         }else{
                             break;
                         }
@@ -76,6 +88,12 @@ public class PlayerViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player_view);
+        if(flagMedia){
+            mediaPlayer.reset();
+           // mediaPlayer.release();
+
+        }
+        flagMedia = true;
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("extra_name");
@@ -91,6 +109,15 @@ public class PlayerViewActivity extends AppCompatActivity {
         btnPause = findViewById(R.id.btnPause);
         btnPre = findViewById(R.id.btnPre);
         btnNext = findViewById(R.id.btnNext);
+        imgShow = findViewById(R.id.imgShow);
+
+        bmpMp3 = Functivity.getCover(path);
+        if(bmpMp3 == null){
+            imgShow.setImageResource(R.drawable.test);
+        }else{
+            imgShow.setImageBitmap(bmpMp3);
+        }
+
 
 
         txtMusic.setText(name);
@@ -142,6 +169,14 @@ public class PlayerViewActivity extends AppCompatActivity {
                 position--;
                 txtMusic.setText( Music.musicList.get(position).getName());
                 String tempPath = Music.musicList.get(position).getPath();
+
+                bmpMp3 = Functivity.getCover(tempPath);
+                if(bmpMp3 == null){
+                    imgShow.setImageResource(R.drawable.test);
+                }else{
+                    imgShow.setImageBitmap(bmpMp3);
+                }
+
                 try{
                     File file = new File(tempPath);
                     mediaPlayer.setDataSource(file.getPath());
@@ -159,29 +194,11 @@ public class PlayerViewActivity extends AppCompatActivity {
 
         btnNext.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                btnPause.setVisibility(View.VISIBLE);
-                btnPlay.setVisibility(View.GONE);
-                mediaPlayer.reset();//reset将播放器变为Idle状态后才能使用setDataSource换另一首
-                if(position == Music.musicList.size()-1){
-                    position = -1;
-                }
-                position++;
-                txtMusic.setText( Music.musicList.get(position).getName());
-                String tempPath = Music.musicList.get(position).getPath();
-                try{
-                    File file = new File(tempPath);
-                    mediaPlayer.setDataSource(file.getPath());
-                    mediaPlayer.prepare();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                mediaPlayer.start();
-
-                int time = mediaPlayer.getDuration()/1000;
-                String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
-                txtTimeMax.setText(str);
+                nextSong();
             }
         });
+
+
 
         SBMusicInfo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -212,6 +229,35 @@ public class PlayerViewActivity extends AppCompatActivity {
 
     }
 
+    private void nextSong(){
+        btnPause.setVisibility(View.VISIBLE);
+        btnPlay.setVisibility(View.GONE);
+        mediaPlayer.reset();//reset将播放器变为Idle状态后才能使用setDataSource换另一首
+        if(position == Music.musicList.size()-1){
+            position = -1;
+        }
+        position++;
+        txtMusic.setText( Music.musicList.get(position).getName());
+        String tempPath = Music.musicList.get(position).getPath();
+        bmpMp3 = Functivity.getCover(tempPath);
+        if(bmpMp3 == null){
+            imgShow.setImageResource(R.drawable.test);
+        }else{
+            imgShow.setImageBitmap(bmpMp3);
+        }
+        try{
+            File file = new File(tempPath);
+            mediaPlayer.setDataSource(file.getPath());
+            mediaPlayer.prepare();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        mediaPlayer.start();
+
+        int time = mediaPlayer.getDuration()/1000;
+        String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
+        txtTimeMax.setText(str);
+    }
 
     private void initMediaPlayer(String path){
         try{
@@ -232,12 +278,12 @@ public class PlayerViewActivity extends AppCompatActivity {
     }
 
     public void onDestroy(){
-
+        //将本活动创建的子线程中的循环参数设置为false，跳出此子线程
         flag = false;
         super.onDestroy();
-        if(mediaPlayer != null){
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
+//        if(mediaPlayer != null){
+//            mediaPlayer.stop();
+//            mediaPlayer.release();
+//        }
     }
 }
