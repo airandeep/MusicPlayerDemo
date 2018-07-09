@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +13,11 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.a11084919.musicplayerdemo.MusicListActivity;
-import com.example.a11084919.musicplayerdemo.PlayerViewActivity;
+import com.example.a11084919.musicplayerdemo.PlayerActivityTest;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.functivity.Functivity;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static android.support.v4.content.ContextCompat.startActivity;
 
 public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.ViewHolder> {
     public List<Music> mMusicList;
@@ -75,7 +69,7 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
                     intent.putExtra("extra_name",name);
                     intent.putExtra("extra_path",path);
                     intent.putExtra("extra_position",String.valueOf(position));
-                    intent.setClass(context,PlayerViewActivity.class);
+                    intent.setClass(context,PlayerActivityTest.class);
 
                     context.startActivity(intent);
                 }else{
@@ -98,6 +92,9 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
                 TextView msg =  dialog.findViewById(R.id.tv_msg);
                 Button cancel = dialog.findViewById(R.id.btn_cancle);
                 Button sure = dialog.findViewById(R.id.btn_sure);
+                int position = holder.getAdapterPosition();
+                Music music = mMusicList.get(position);
+                msg.setText("确定要删除歌曲" + music.getName());
                 if (msg == null || cancel == null || sure == null) return;
 
                 cancel.setOnClickListener(new View.OnClickListener(){
