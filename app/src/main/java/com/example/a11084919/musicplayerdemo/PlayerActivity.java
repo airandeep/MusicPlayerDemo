@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -40,16 +41,13 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     private Button btnNext;
     private ImageView imgShow;
     Bitmap bmpMp3;
-    private Thread thread;
 
-    private boolean cycleFlag;
     private boolean notiFlag;
 
     private String path;
     private String name;
     private int position;
 
-    final int milliseconds = 100;
 
     private IPlay mPlayer;
 
@@ -72,33 +70,6 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         }
     };
 
-
-
-    Handler mHandler = new Handler(){
-        public void handleMessage(Message msg){
-            switch (msg.what){
-                case 0:
-                    int position = mPlayer.getProgress();
-                    int time = mPlayer.getDuration();
-                    int max = SBMusicInfo.getMax();
-                    //proMusicInfo.setProgress(position*max/time);
-                    int timeTemp = position / 1000;
-                    String str = String.format("%02d:%02d", timeTemp / 60 % 60, timeTemp % 60);
-                    if (txtTimeNow != null && SBMusicInfo != null) {
-                        txtTimeNow.setText(str);
-                        SBMusicInfo.setProgress(max * position / time);
-                    }
-
-                    if (position > time - 1000) {//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
-                        mPlayer.playNext();
-                    }
-
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
 
     @Override
@@ -209,31 +180,27 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         }else{
             mPlayer.play(path,name,position,false);
         }
+        int time = mPlayer.getDuration();
+        //播放器暂停状态进入时刷新一下界面
+        if(!mPlayer.isPlaying()){
+            btnPause.setVisibility(View.GONE);
+            btnPlay.setVisibility(View.VISIBLE);
 
+            int position = mPlayer.getProgress();
+            int max = SBMusicInfo.getMax();
+            int timeTemp = position / 1000;
+            String str = String.format("%02d:%02d", timeTemp / 60 % 60, timeTemp % 60);
+            txtTimeNow.setText(str);
+            SBMusicInfo.setProgress(max * position / time);
+        }
         //显示通知栏
         mPlayer.initNotification();
         //设置当前音乐总时间
-        int time = mPlayer.getDuration()/1000;
+        time = time/1000;
         String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
         txtTimeMax.setText(str);
 
-        cycleFlag = true;
-        //每隔0.1秒更新一波进度条
 
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (cycleFlag){
-                    try{
-                        sleep(milliseconds);
-                    }catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
-                    mHandler.sendEmptyMessage(0);
-                }
-            }
-        });
-        thread.start();
     }
 
     private void bindPlayService(){
@@ -246,16 +213,28 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         unbindService(connection);
     }
 
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        switch (keyCode){
+//            case KeyEvent.KEYCODE_BACK:
+//
+//                Intent intent = new Intent(PlayerActivity.this,MusicListActivity.class);
+//                startActivity(intent);
+//                break;
+//            default:
+//                break;
+//        }
+//        return true;
+//    }
 
     public void onDestroy(){
         //将本活动创建的子线程中的循环参数设置为false，跳出此子线程//一定要跳出，否则每次此线程会存在，下一次创建活动会再次起一个新线程导致
-        cycleFlag = false;
+        //cycleFlag = false;
         //取消绑定，然后将活动实例在服务中容器移除
         unbindPlaybackService();
         super.onDestroy();
     }
 //////////////////////////////////////////
-    //这里只负责显示，切换歌曲已经在服务中完成了
+    //这里只负责切换显示，切换歌曲已经在服务中完成了
     public void onSwitchLast(){
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
@@ -310,5 +289,15 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
             btnPause.setVisibility(View.GONE);
             btnPlay.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void onUpdateProgressBar(){
+        int position = mPlayer.getProgress();
+        int time = mPlayer.getDuration();
+        int max = SBMusicInfo.getMax();
+        int timeTemp = position / 1000;
+        String str = String.format("%02d:%02d", timeTemp / 60 % 60, timeTemp % 60);
+        txtTimeNow.setText(str);
+        SBMusicInfo.setProgress(max * position / time);
     }
 }

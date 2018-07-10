@@ -2,43 +2,63 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-
-    android:clickable="true"
-    android:focusable="true"
+    android:background="#1ADDF9FF"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <CheckBox
-        android:id="@+id/ckChoose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:visibility="gone"/>
-    <TextView
-        android:background="@drawable/recycler_item_selector"
-        android:id="@+id/music_name"
+    android:layout_height="40dp">
+
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"/>-->
+    <LinearLayout
+        android:id="@+id/btnOk"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="38dp"
-        android:layout_gravity="center_vertical"
-        android:gravity="center_vertical"
-        android:textSize="20dp"
-        android:text="菊花台"
-        android:singleLine="true"/>
-    <Button
+        android:background="@drawable/recycler_item_selector">
+        <CheckBox
+            android:id="@+id/ckChoose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:visibility="gone"/>
+        <TextView
+            android:id="@+id/music_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:textSize="20dp"
+            android:text="菊花台"
+            android:singleLine="true"/>
+    </LinearLayout>
+
+    <FrameLayout
         android:id="@+id/btnMusicDelete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:layout_gravity="center_vertical"
-        android:text="DELETE"/>
+        android:layout_height="match_parent"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:background="@drawable/recycler_item_selector">
 
-    <!--<TextView-->
-        <!--android:id="@+id/music_name_test"-->
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/image_button_action"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_list_item_action"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
+    </FrameLayout>
+    <!--<Button-->
+        <!--android:id="@+id/btnMusicDelete"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_vertical"-->
-        <!--android:layout_marginLeft="10dp"-->
         <!--android:textSize="20dp"-->
-        <!--android:text="shit"/>-->
+        <!--android:layout_gravity="center_vertical"-->
+        <!--android:text="DELETE"/>-->
+
 
 </LinearLayout>

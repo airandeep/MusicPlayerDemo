@@ -48,7 +48,7 @@ public class MusicListActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapterPlus = new MusicAdapterRecycle(Music.musicList);
+        adapterPlus = new MusicAdapterRecycle(MusicListActivity.this,Music.musicList);
         recyclerView.setAdapter(adapterPlus);
 
 
@@ -68,7 +68,6 @@ public class MusicListActivity extends BaseActivity {
                 LinOutButton.setVisibility(View.VISIBLE);
                 adapterPlus.setEditMode(1);
                 stateNow = STATE_MANAGE;
-                //Music.selectNum = 0;
             }
         });
 

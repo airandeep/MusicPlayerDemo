@@ -40,6 +40,8 @@ public interface IPlay {
         void onSwitchNext();
 
         void onPlayStatusChanged();
+        //更新活动中进度条//
+        void onUpdateProgressBar();
     }
 
 }

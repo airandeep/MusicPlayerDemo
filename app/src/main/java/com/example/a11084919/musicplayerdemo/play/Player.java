@@ -179,4 +179,10 @@ public class Player implements IPlay {
             callback.onSwitchNext();
         }
     }
+
+    public void updateProgressBar(){
+        for(Callback callback : mCallbacks){
+            callback.onUpdateProgressBar();
+        }
+    }
 }

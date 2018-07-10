@@ -54,11 +54,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
             switch (msg.what){
                 case 0:
                     if(mPlayer.isPlaying()){
-                        int position = mPlayer.getProgress();
-                        int time = mPlayer.getDuration();
-                        if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
-                            mPlayer.playNext();
-                        }
+
+                        mPlayer.updateProgressBar();
                     }
 
                     break;
@@ -186,6 +183,14 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         showNotification();
     }
 
+    //服务中此方法用于列表循环
+    public void onUpdateProgressBar(){
+        int position = mPlayer.getProgress();
+        int time = mPlayer.getDuration();
+        if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
+            mPlayer.playNext();
+        }
+    }
     //创建通知，使本服务为前台服务，从而不至于被系统回收
     private void showNotification() {
         // The PendingIntent to launch our activity if the user selects this notification
@@ -203,6 +208,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                     .build();
         startForeground(1, notification);
     }
+
+
 
     //通知栏绑定UI
     private RemoteViews getSmallContentView() {
