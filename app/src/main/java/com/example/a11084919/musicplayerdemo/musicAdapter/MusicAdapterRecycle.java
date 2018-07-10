@@ -13,18 +13,18 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.a11084919.musicplayerdemo.MusicListActivity;
-import com.example.a11084919.musicplayerdemo.PlayerActivityTest;
+import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.functivity.Functivity;
+import com.example.a11084919.musicplayerdemo.publicObjective.Functivity;
 
 import java.util.List;
 
-public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.ViewHolder> {
+public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycle.ViewHolder> {
     public List<Music> mMusicList;
 
-
+    //private OnRvItemClick mOnRvItemClick;
     int mEditMode = 0;
-    private static String TAG = "MusicAdapterPlus";
+    private static String TAG = "MusicAdapterRecycle";
     static class ViewHolder extends RecyclerView.ViewHolder{
         //View musicView;
         TextView txtMusicName;
@@ -44,7 +44,7 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
     }
 
     //像适配器中传入数据集合
-    public MusicAdapterPlus(List<Music> musicList){
+    public MusicAdapterRecycle(List<Music> musicList){
         mMusicList = musicList;
     }
 
@@ -69,7 +69,7 @@ public class MusicAdapterPlus extends RecyclerView.Adapter<MusicAdapterPlus.View
                     intent.putExtra("extra_name",name);
                     intent.putExtra("extra_path",path);
                     intent.putExtra("extra_position",String.valueOf(position));
-                    intent.setClass(context,PlayerActivityTest.class);
+                    intent.setClass(context,PlayerActivity.class);
 
                     context.startActivity(intent);
                 }else{

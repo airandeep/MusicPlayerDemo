@@ -1,13 +1,13 @@
 package com.example.a11084919.musicplayerdemo.musicAdapter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Music {
 
+
     public static List<Music>  musicList = new ArrayList<>();
-    public static int selectNum = 0;
+
 
     private String name;
     private String path;

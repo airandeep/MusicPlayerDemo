@@ -12,10 +12,10 @@ import com.example.a11084919.musicplayerdemo.R;
 
 import java.util.List;
 
-public class MusicAdapter extends ArrayAdapter<Music>{
+public class MusicAdapterList extends ArrayAdapter<Music>{
     private int resourceId;//listView 自定义 xml
 
-    public MusicAdapter(Context context, int textViewResourceId, List<Music> objects){
+    public MusicAdapterList(Context context, int textViewResourceId, List<Music> objects){
         super(context,textViewResourceId,objects);
         resourceId = textViewResourceId;
     }

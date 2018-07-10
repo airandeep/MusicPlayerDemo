@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
+
+    android:clickable="true"
+    android:focusable="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    安卓ImageView圆形
     <CheckBox
         android:id="@+id/ckChoose"
         android:layout_width="wrap_content"
@@ -11,12 +14,13 @@
         android:layout_gravity="center_vertical"
         android:visibility="gone"/>
     <TextView
+        android:background="@drawable/recycler_item_selector"
         android:id="@+id/music_name"
         android:layout_weight="1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10dp"
+        android:gravity="center_vertical"
         android:textSize="20dp"
         android:text="菊花台"
         android:singleLine="true"/>
@@ -24,8 +28,9 @@
         android:id="@+id/btnMusicDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="20dp"
         android:layout_gravity="center_vertical"
-        android:text="删除"/>
+        android:text="DELETE"/>
 
     <!--<TextView-->
         <!--android:id="@+id/music_name_test"-->
@@ -35,4 +40,5 @@
         <!--android:layout_marginLeft="10dp"-->
         <!--android:textSize="20dp"-->
         <!--android:text="shit"/>-->
+
 </LinearLayout>

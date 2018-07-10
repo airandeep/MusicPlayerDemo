@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlayerViewActivity"
+    tools:context=".PlayerActivity"
     android:orientation="vertical">
 
     <com.example.a11084919.musicplayerdemo.controlsOv.MarqueeTextView
@@ -30,9 +30,9 @@
         android:layout_height="0dp">
         <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgShow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/test"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/picture_default"
         android:layout_centerInParent="true"/>
 
     </RelativeLayout>
@@ -83,12 +83,12 @@
                 android:id="@+id/btnPlay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:text="播放"/>
             <Button
                 android:id="@+id/btnPause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:text="暂停"/>
             <Button
                 android:id="@+id/btnNext"

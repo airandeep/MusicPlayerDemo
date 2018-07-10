@@ -11,20 +11,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".PlayerViewActivity"
-            android:label="音乐播放" />
-        <activity
-            android:name=".MusicListActivity"
-            android:label="本地音乐" />
 
+        <activity
+            android:name=".PlayerActivity"
+            android:label="音乐播放"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".MusicListActivity"
+            android:label="播放列表" />
+
+        <service
+            android:name=".play.PlayService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="io.github.ryanhoo.music.ACTION.PLAY_TOGGLE"/>
+                <action android:name="io.github.ryanhoo.music.ACTION.PLAY_NEXT"/>
+                <action android:name="io.github.ryanhoo.music.ACTION.PLAY_LAST"/>
+                <action android:name="io.github.ryanhoo.music.ACTION.STOP_SERVICE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
