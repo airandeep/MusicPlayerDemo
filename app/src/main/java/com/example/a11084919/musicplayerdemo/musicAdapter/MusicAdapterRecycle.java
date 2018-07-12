@@ -2,17 +2,17 @@ package com.example.a11084919.musicplayerdemo.musicAdapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -21,7 +21,10 @@ import android.widget.Toast;
 import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.publicObjective.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.PublicObject;
+
+import org.litepal.crud.DataSupport;
 
 import java.util.List;
 
@@ -31,7 +34,6 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     int mEditMode = 0;
     private static String TAG = "MusicAdapterRecycle";
     private Context mContext;
-    private PopupMenu popupMenu;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         //View musicView;
@@ -39,6 +41,8 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         TextView txtMusicName;
         FrameLayout btnMusicDelete;
         CheckBox ckChoose;
+//        ImageView imgAlbum;
+//        ImageView imgPlaying;
 
 
         public ViewHolder(View view) {
@@ -48,7 +52,8 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
             txtMusicName = view.findViewById(R.id.music_name);
             btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
             ckChoose = view.findViewById(R.id.ckChoose);
-
+//            imgAlbum = view.findViewById(R.id.imgAlbum);
+//            imgPlaying = view.findViewById(R.id.imgPlaying);
         }
     }
 
@@ -79,6 +84,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                     intent.putExtra("extra_position", String.valueOf(position));
                     intent.setClass(context, PlayerActivity.class);
 
+                    //PublicObject.playingIndex = position;
                     context.startActivity(intent);
                 } else {
                     if (holder.ckChoose.isChecked()) {
@@ -93,34 +99,6 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
         holder.btnMusicDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                final AlertDialog dialog = new AlertDialog.Builder(v.getContext()).create();
-//                dialog.show();
-//                dialog.getWindow().setContentView(R.layout.pop_user);
-//                TextView msg =  dialog.findViewById(R.id.tv_msg);
-//                Button cancel = dialog.findViewById(R.id.btn_cancle);
-//                Button sure = dialog.findViewById(R.id.btn_sure);
-//                int position = holder.getAdapterPosition();
-//                Music music = mMusicList.get(position);
-//                msg.setText("确定要删除歌曲" + music.getName());
-//                if (msg == null || cancel == null || sure == null) return;
-//
-//                cancel.setOnClickListener(new View.OnClickListener(){
-//                    public void onClick(View v){
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                sure.setOnClickListener(new View.OnClickListener(){
-//                    public void onClick(View v){
-//                        int position = holder.getAdapterPosition();
-//                        Music music = mMusicList.get(position);
-//                        mMusicList.remove(position);
-//                        //移除适配器中的内容即使notifyDataSetChanged刷新一下
-//                        Functivity.deleteFile(music.getPath());
-//                        notifyDataSetChanged();
-//                        dialog.dismiss();
-//                    }
-//                });
                 int position = holder.getAdapterPosition();
                 showPopupMenu(v,position);
             }
@@ -147,8 +125,20 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     //交互的关键所在
     public void onBindViewHolder(ViewHolder holder, int position) {
         Music music = mMusicList.get(position);
-        holder.txtMusicName.setText(music.getName());
+        holder.txtMusicName.setText(music.getTitle());
 
+//        Bitmap bitmap = Functivity.getCover(music.getPic());
+//        if(bitmap == null){
+//            holder.imgAlbum.setImageResource(R.drawable.picture_default);
+//        }else{
+//            holder.imgAlbum.setImageBitmap(bitmap);
+//        }
+//
+//        if(position == PublicObject.playingIndex){
+//            holder.imgPlaying.setVisibility(View.VISIBLE);
+//        }else{
+//            holder.imgPlaying.setVisibility(View.GONE);
+//        }
         //
         if (mMusicList.get(position).isSelect()) {
             holder.ckChoose.setChecked(true);
@@ -196,6 +186,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                         mMusicList.remove(position);
                         //移除适配器中的内容即使notifyDataSetChanged刷新一下
                         Functivity.deleteFile(music.getPath());
+                        DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
                         notifyDataSetChanged();
                         Toast.makeText(mContext,"歌曲" + music.getName() + "删除成功",Toast.LENGTH_SHORT).show();
                         break;

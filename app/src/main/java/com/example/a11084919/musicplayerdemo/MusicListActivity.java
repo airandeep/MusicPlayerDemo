@@ -1,12 +1,6 @@
 package com.example.a11084919.musicplayerdemo;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,11 +11,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.a11084919.musicplayerdemo.publicObjective.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
 
-import java.io.File;
+import org.litepal.crud.DataSupport;
 
 public class MusicListActivity extends BaseActivity {
 
@@ -48,19 +43,30 @@ public class MusicListActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapterPlus = new MusicAdapterRecycle(MusicListActivity.this,Music.musicList);
+        adapterPlus = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
         recyclerView.setAdapter(adapterPlus);
 
 
 
-        if(Music.musicList.size() == 0){
-            Toast.makeText(this,"本地无MP3或flac格式的音乐文件",Toast.LENGTH_SHORT).show();
-        }
+//        if(PublicObject.musicList.size() == 0){
+//            Toast.makeText(this,"本地无MP3或flac格式的音乐文件",Toast.LENGTH_SHORT).show();
+//        }
 
         btnManage = findViewById(R.id.btnManage);
         LinOutButton = findViewById(R.id.LinOutButton);
         btnChooseAll = findViewById(R.id.btnChooseAll);
         btnDelete = findViewById(R.id.btnDelete);
+
+        int n = PublicObject.musicList.size(),count = 0;
+        for(int i = 0;i<n;i++){
+            if(PublicObject.musicList.get(i).isSelect()){
+                count++;
+            }
+        }
+        if(count == n){
+            btnChooseAll.setText("全不选");
+        }
+
 
         btnManage.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -73,16 +79,16 @@ public class MusicListActivity extends BaseActivity {
 
         btnChooseAll.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                int n = Music.musicList.size();
+                int n = PublicObject.musicList.size();
                 String flag = btnChooseAll.getText().toString();
                 if(flag.equals("全选")){
                     for(int i = 0;i < n;i++){
-                        Music.musicList.get(i).setSelect(true);
+                        PublicObject.musicList.get(i).setSelect(true);
                     }
                     btnChooseAll.setText("全不选");
                 }else{
                     for(int i = 0;i < n;i++){
-                        Music.musicList.get(i).setSelect(false);
+                        PublicObject.musicList.get(i).setSelect(false);
                     }
                     btnChooseAll.setText("全选");
                 }
@@ -93,9 +99,9 @@ public class MusicListActivity extends BaseActivity {
         btnDelete.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
                 boolean flag = false;
-                int n = Music.musicList.size();
+                int n = PublicObject.musicList.size();
                 for(int i = 0;i < n;i++){
-                    if(Music.musicList.get(i).isSelect()){
+                    if(PublicObject.musicList.get(i).isSelect()){
                         flag = true;
                         break;
                     }
@@ -111,7 +117,7 @@ public class MusicListActivity extends BaseActivity {
 
                     int num = 0;
                     for(int i = 0;i<n;i++){
-                        if(Music.musicList.get(i).isSelect()){
+                        if(PublicObject.musicList.get(i).isSelect()){
                             num++;
                         }
                     }
@@ -130,6 +136,7 @@ public class MusicListActivity extends BaseActivity {
                                 if(music.isSelect()){
                                     adapterPlus.getMyMusicList().remove(music);
                                     Functivity.deleteFile(music.getPath());
+                                    DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
                                 }
                             }
                             adapterPlus.notifyDataSetChanged();

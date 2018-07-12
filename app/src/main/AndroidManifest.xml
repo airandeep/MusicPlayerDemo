@@ -3,12 +3,12 @@
     package="com.example.a11084919.musicplayerdemo">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <application
+        android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/airan_launch"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/airan_launch"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
@@ -33,7 +33,7 @@
         <service
             android:name=".play.PlayService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="io.github.ryanhoo.music.ACTION.PLAY_TOGGLE"/>
                 <action android:name="io.github.ryanhoo.music.ACTION.PLAY_NEXT"/>

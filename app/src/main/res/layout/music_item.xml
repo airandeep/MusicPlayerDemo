@@ -4,7 +4,8 @@
     android:orientation="horizontal"
     android:background="#1ADDF9FF"
     android:layout_width="match_parent"
-    android:layout_height="40dp">
+    android:layout_height="40dp"
+    android:layout_margin="1dp">
 
     <!--<View-->
         <!--android:layout_width="match_parent"-->
@@ -23,6 +24,17 @@
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             android:visibility="gone"/>
+        <!--<ImageView-->
+            <!--android:id="@+id/imgPlaying"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:src="@drawable/playing"-->
+            <!--android:visibility="gone"/>-->
+        <!--<ImageView-->
+            <!--android:id="@+id/imgAlbum"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:src="@drawable/airan_launch"/>-->
         <TextView
             android:id="@+id/music_name"
             android:layout_width="match_parent"

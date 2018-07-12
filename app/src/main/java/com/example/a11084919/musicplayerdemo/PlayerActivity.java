@@ -5,18 +5,15 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.a11084919.musicplayerdemo.publicObjective.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 import com.example.a11084919.musicplayerdemo.play.IPlay;
 import com.example.a11084919.musicplayerdemo.play.PlayService;
@@ -60,13 +57,13 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             playService = ((PlayService.LocalBinder)iBinder).getService();
             mPlayer = playService;
-            mPlayer.registerCallback(PlayerActivity.this);
+           // mPlayer.registerCallback(PlayerActivity.this);
             initMusicMedia();
         }
         //活动销毁时取消绑定
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mPlayer.unregisterCallback(PlayerActivity.this);
+
         }
     };
 
@@ -157,7 +154,21 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
             notiFlag = true;
             path = mPlayer.getMusicPath();
             name = mPlayer.getMusicName();
-            position = mPlayer.getPosition();
+            boolean tempFlag = false;
+            int n = PublicObject.musicList.size();
+            //因为有可能删除导致mPlayer中保存的position不是歌曲在静态成员变量musicList中歌曲实际位置
+            for(int i = 0;i<n;i++){
+                if(path.equals(PublicObject.musicList.get(i).getPath())){
+                    position = i;
+                    tempFlag = true;
+                    break;
+                }
+            }
+            if(!tempFlag){
+                position = 0;
+            }
+
+            //position = mPlayer.getPosition();
             if(!mPlayer.isPlaying()){
                 btnPause.setVisibility(View.GONE);
                 btnPlay.setVisibility(View.VISIBLE);
@@ -173,6 +184,8 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         }else{
             imgShow.setImageBitmap(bmpMp3);
         }
+
+
         txtMusic.setText(name);
 
         if(notiFlag){
@@ -211,6 +224,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
 
     private void unbindPlaybackService(){
         unbindService(connection);
+       // mPlayer.unregisterCallback(PlayerActivity.this);
     }
 
 //    public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -231,6 +245,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         //cycleFlag = false;
         //取消绑定，然后将活动实例在服务中容器移除
         unbindPlaybackService();
+
         super.onDestroy();
     }
 //////////////////////////////////////////
@@ -239,13 +254,15 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
 
-        if(position == 0){
-            position = Music.musicList.size();
-        }
-        position--;
+//        if(position == 0){
+//            position = PublicObject.musicList.size();
+//        }
+//        position--;
 
-        txtMusic.setText( Music.musicList.get(position).getName());
-        String tempPath = Music.musicList.get(position).getPath();
+        position = mPlayer.getPosition();
+
+        txtMusic.setText( PublicObject.musicList.get(position).getName());
+        String tempPath = PublicObject.musicList.get(position).getPath();
         bmpMp3 = Functivity.getCover(tempPath);
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
@@ -262,13 +279,10 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
 
-        if(position == Music.musicList.size()-1){
-            position = -1;
-        }
-        position++;
+        position = mPlayer.getPosition();
 
-        txtMusic.setText( Music.musicList.get(position).getName());
-        String tempPath = Music.musicList.get(position).getPath();
+        txtMusic.setText( PublicObject.musicList.get(position).getName());
+        String tempPath = PublicObject.musicList.get(position).getPath();
         bmpMp3 = Functivity.getCover(tempPath);
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);

@@ -6,7 +6,6 @@
     android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    tools:background="#FFFFFF"
     tools:layout_height="60dp"
     >
 
@@ -39,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            android:textColor="#A9A9A9"
+            android:textColor="#696969"
             android:textSize="16sp"
             android:singleLine="true"
             tools:text="Saycet"
@@ -49,7 +48,7 @@
             android:id="@+id/text_view_artist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#A9A9A9"
+            android:textColor="#696969"
             android:textSize="14sp"
             android:singleLine="true"
             tools:text="Through the window"

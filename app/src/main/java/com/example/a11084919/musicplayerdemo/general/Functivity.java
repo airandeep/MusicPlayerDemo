@@ -1,11 +1,9 @@
-package com.example.a11084919.musicplayerdemo.publicObjective;
+package com.example.a11084919.musicplayerdemo.general;
 
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 
 import java.io.File;
 
@@ -29,6 +27,14 @@ public class Functivity {
         return bitmap;
     }
 
+    public static Bitmap getCover(byte[] mediaByte){
+        Bitmap bitmap = null;
+        if(mediaByte == null){
+            return bitmap;
+        }
+        bitmap= BitmapFactory.decodeByteArray(mediaByte,0,mediaByte.length);
+        return bitmap;
+    }
 
 
 

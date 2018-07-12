@@ -4,22 +4,24 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.publicObjective.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 
-import static android.app.Notification.DEFAULT_LIGHTS;
 import static java.lang.Thread.sleep;
 
 
@@ -33,8 +35,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
     private static String TAG = "PlayService";
     private Player mPlayer;
-   // private Notification notification;
-    //通知相关
+
     private RemoteViews mContentViewSmall;
     private boolean cycleFlag;
     final int milliseconds = 100;
@@ -54,7 +55,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
             switch (msg.what){
                 case 0:
                     if(mPlayer.isPlaying()){
-
                         mPlayer.updateProgressBar();
                     }
 
@@ -114,6 +114,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     public boolean play(String musicPath,String musicName,int position,boolean notiFlag){
         return mPlayer.play(musicPath,musicName,position,notiFlag);
     }
+
 
     public int getPosition() {
         return mPlayer.getPosition();
@@ -204,7 +205,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                     .setCustomContentView(getSmallContentView())
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setOngoing(true)
-                    .setSound(null)
                     .build();
         startForeground(1, notification);
     }
@@ -236,16 +236,15 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private void updateRemoteViews(RemoteViews remoteView) {
         remoteView.setImageViewResource(R.id.image_view_play_toggle, isPlaying()
                 ? R.drawable.ic_remote_view_pause : R.drawable.ic_remote_view_play);
-        String tempPath = Music.musicList.get(getPosition()).getPath();
+        String tempPath = PublicObject.musicList.get(getPosition()).getPath();
         Bitmap bmpMp3 = Functivity.getCover(tempPath);
         if(bmpMp3 == null){
             remoteView.setImageViewResource(R.id.image_view_album,R.drawable.picture_default);
         }else{
             remoteView.setImageViewBitmap(R.id.image_view_album,bmpMp3 );
         }
-        String tempName = Music.musicList.get(getPosition()).getName();
-        remoteView.setTextViewText(R.id.text_view_name, tempName);
-        remoteView.setTextViewText(R.id.text_view_artist, "AIRAN");
+        remoteView.setTextViewText(R.id.text_view_name, PublicObject.musicList.get(getPosition()).getTitle());
+        remoteView.setTextViewText(R.id.text_view_artist, PublicObject.musicList.get(getPosition()).getArtist());
     }
 
 

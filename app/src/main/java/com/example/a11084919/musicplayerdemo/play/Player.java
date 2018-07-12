@@ -1,9 +1,11 @@
 package com.example.a11084919.musicplayerdemo.play;
 
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 
 import java.io.IOException;
@@ -15,8 +17,7 @@ public class Player implements IPlay {
     private static volatile Player sInstance;
     private MediaPlayer mediaPlayer;
 
-    private boolean isPaused;
-    //当前歌曲位置
+    //当前歌曲位置//一定要保证此变量在删除歌曲后保持正确
     private int position;
     //当前歌曲路径
     private String musicPath;
@@ -58,6 +59,8 @@ public class Player implements IPlay {
 
         //
         if(notiFlag || musicPath.equals(this.musicPath)){
+            //当再次有播放列表点进来时由于有可能删除导致歌曲在链表list中的位置产生变化，所以更新一波
+            this.position = position;
             return true;
         }else{
             this.musicPath = musicPath;
@@ -79,6 +82,7 @@ public class Player implements IPlay {
 
     }
 
+
     public void registerCallback(Callback callback){
         mCallbacks.add(callback);
     }
@@ -90,7 +94,6 @@ public class Player implements IPlay {
     public boolean pause() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-            isPaused = true;
             notifyPlayStatusChanged();
             return true;
         }
@@ -119,14 +122,15 @@ public class Player implements IPlay {
     }
 
     public boolean playLast(){
-        mediaPlayer.reset();
         if(position == 0){
-            position = Music.musicList.size();
+            position = PublicObject.musicList.size();
         }
         position--;
-        musicPath = Music.musicList.get(position).getPath();
-        musicName = Music.musicList.get(position).getName();
+        musicPath = PublicObject.musicList.get(position).getPath();
+        musicName = PublicObject.musicList.get(position).getName();
         try {
+            //切歌时必须先stop；
+            mediaPlayer.stop();
             mediaPlayer.reset();
             mediaPlayer.setDataSource(musicPath);
             mediaPlayer.prepare();
@@ -139,15 +143,15 @@ public class Player implements IPlay {
     }
 
     public boolean playNext(){
-        mediaPlayer.reset();
-        if(position == Music.musicList.size()-1){
+        if(position >= PublicObject.musicList.size()-1){
             position = -1;
         }
         position++;
 
-        musicPath = Music.musicList.get(position).getPath();
-        musicName = Music.musicList.get(position).getName();
+        musicPath = PublicObject.musicList.get(position).getPath();
+        musicName = PublicObject.musicList.get(position).getName();
         try {
+            mediaPlayer.stop();
             mediaPlayer.reset();
             mediaPlayer.setDataSource(musicPath);
             mediaPlayer.prepare();
