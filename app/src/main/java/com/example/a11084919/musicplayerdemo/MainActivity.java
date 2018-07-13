@@ -133,11 +133,10 @@ public class MainActivity extends BaseActivity {
                     strShow = file.toString();
                     mHandler.sendEmptyMessage(0);
                     String fileName = file.getName();
-                    if(fileName.endsWith(".mp3") || fileName.endsWith(".flac")){
-                        //Log.d(TAG, "音乐名字为:"+fileName);
-                        mmr.setDataSource(file.toString());
+                    if(fileName.endsWith(".mp3") || fileName.endsWith(".flac")||fileName.endsWith(".MP3")){
                         try
                         {
+                            mmr.setDataSource(file.toString());
                             Music music = new Music();
                             String name = fileName.substring(0,fileName.lastIndexOf(".")).toString();
                             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
@@ -148,10 +147,16 @@ public class MainActivity extends BaseActivity {
 
                             music.setPath(file.toString());
                             music.setName(name);
+                            if(title == null){
+                                title = fileName.substring(fileName.lastIndexOf("-") + 2,fileName.lastIndexOf(".")).toString();
+                                artist = fileName.substring(0,fileName.lastIndexOf("-")-1);
+                            }
                             music.setTitle(title);
                             music.setAlbum(album);
                             music.setArtist(artist);
-                            music.setPic(pic);
+                            if(pic != null){
+                                music.setPic(pic);
+                            }
                             music.save();
                             PublicObject.musicList.add(music);
                         }
@@ -159,8 +164,6 @@ public class MainActivity extends BaseActivity {
                         {
                             e.printStackTrace();
                         }
-
-
 
                     }
                 }

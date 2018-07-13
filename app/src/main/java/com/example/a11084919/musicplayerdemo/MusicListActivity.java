@@ -48,10 +48,6 @@ public class MusicListActivity extends BaseActivity {
 
 
 
-//        if(PublicObject.musicList.size() == 0){
-//            Toast.makeText(this,"本地无MP3或flac格式的音乐文件",Toast.LENGTH_SHORT).show();
-//        }
-
         btnManage = findViewById(R.id.btnManage);
         LinOutButton = findViewById(R.id.LinOutButton);
         btnChooseAll = findViewById(R.id.btnChooseAll);

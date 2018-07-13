@@ -122,7 +122,8 @@ public class Player implements IPlay {
     }
 
     public boolean playLast(){
-        if(position == 0){
+        //解决删除问题
+        if(position == 0 || position >= PublicObject.musicList.size()-1){
             position = PublicObject.musicList.size();
         }
         position--;
@@ -143,6 +144,7 @@ public class Player implements IPlay {
     }
 
     public boolean playNext(){
+        //解决删除问题
         if(position >= PublicObject.musicList.size()-1){
             position = -1;
         }

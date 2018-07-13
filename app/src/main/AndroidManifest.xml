@@ -28,7 +28,8 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".MusicListActivity"
-            android:label="播放列表"/>
+            android:label="播放列表"
+            android:launchMode="singleTask"/>
 
         <service
             android:name=".play.PlayService"

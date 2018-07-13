@@ -6,6 +6,7 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -57,7 +58,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             playService = ((PlayService.LocalBinder)iBinder).getService();
             mPlayer = playService;
-           // mPlayer.registerCallback(PlayerActivity.this);
+            mPlayer.registerCallback(PlayerActivity.this);
             initMusicMedia();
         }
         //活动销毁时取消绑定
@@ -224,21 +225,21 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
 
     private void unbindPlaybackService(){
         unbindService(connection);
-       // mPlayer.unregisterCallback(PlayerActivity.this);
+        mPlayer.unregisterCallback(PlayerActivity.this);
     }
 
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        switch (keyCode){
-//            case KeyEvent.KEYCODE_BACK:
-//
-//                Intent intent = new Intent(PlayerActivity.this,MusicListActivity.class);
-//                startActivity(intent);
-//                break;
-//            default:
-//                break;
-//        }
-//        return true;
-//    }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                Intent intent = new Intent(PlayerActivity.this,MusicListActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 
     public void onDestroy(){
         //将本活动创建的子线程中的循环参数设置为false，跳出此子线程//一定要跳出，否则每次此线程会存在，下一次创建活动会再次起一个新线程导致

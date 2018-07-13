@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="64dp"
     tools:layout_height="60dp"
-    >
+    android:background="@drawable/bg_white_cornor_10">
 
     <ImageView
         android:id="@+id/image_view_album"
@@ -17,7 +17,7 @@
         android:layout_marginRight="12dp"
         android:layout_centerVertical="true"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/airan_launch"
         />
 
 

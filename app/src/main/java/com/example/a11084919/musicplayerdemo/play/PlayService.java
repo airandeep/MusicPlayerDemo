@@ -1,11 +1,14 @@
 package com.example.a11084919.musicplayerdemo.play;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.Handler;
@@ -28,17 +31,21 @@ import static java.lang.Thread.sleep;
 //最终通过在活动
 public class PlayService extends Service implements IPlay,IPlay.Callback{
 
-    private static final String ACTION_PLAY_TOGGLE = "io.github.ryanhoo.music.ACTION.PLAY_TOGGLE";
-    private static final String ACTION_PLAY_LAST = "io.github.ryanhoo.music.ACTION.PLAY_LAST";
-    private static final String ACTION_PLAY_NEXT = "io.github.ryanhoo.music.ACTION.PLAY_NEXT";
-    private static final String ACTION_STOP_SERVICE = "io.github.ryanhoo.music.ACTION.STOP_SERVICE";
+    private static final String ACTION_PLAY_TOGGLE = "airan.music.ACTION.PLAY_TOGGLE";
+    private static final String ACTION_PLAY_LAST = "airan.music.ACTION.PLAY_LAST";
+    private static final String ACTION_PLAY_NEXT = "airan.music.ACTION.PLAY_NEXT";
+    private static final String ACTION_STOP_SERVICE = "airan.music.ACTION.STOP_SERVICE";
 
     private static String TAG = "PlayService";
     private Player mPlayer;
 
-    private RemoteViews mContentViewSmall;
+    //注:千万不要在Service类中定义这2歌类的引用，否则会导致通知和通知栏显示的实例化对象由于强引用无法释放资源造成内存泄漏
+    //private RemoteViews mContentViewSmall
+    //private Notification notification
+
     private boolean cycleFlag;
     final int milliseconds = 100;
+    private NotificationManager manager;
 
     private final Binder binder= new LocalBinder();
     //活动通过此内部类获得此服务对象，从而调用服务对象中的方法
@@ -65,11 +72,27 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         }
     };
 
+    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            handleCommandIntent(intent);
+        }
+    };
+
     public void onCreate() {
         Log.d(TAG, "onCreate: ");
         super.onCreate();
+        manager = (NotificationManager)getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
         mPlayer = Player.getInstance();
         mPlayer.registerCallback(this);//将本服务存到mPlay实例化对象中容器mCallbacks
+
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_PLAY_TOGGLE);
+        filter.addAction(ACTION_PLAY_LAST);
+        filter.addAction(ACTION_PLAY_NEXT);
+        registerReceiver(mIntentReceiver,filter);
+
+
         cycleFlag = true;
         new Thread(new Runnable() {
             @Override
@@ -86,23 +109,48 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         }).start();
     }
 
-    public int onStartCommand(Intent intent,int flags,int startId){
-        if (intent != null) {
-            String action = intent.getAction();
-            if (ACTION_PLAY_TOGGLE.equals(action)) {
+    private void handleCommandIntent(Intent intent){
+        final String command = intent.getAction();
+        switch (command){
+            case ACTION_PLAY_TOGGLE:{
                 if(mPlayer.isPlaying()){
                     pause();
                 }else{
                     rePlay();
                 }
-            } else if (ACTION_PLAY_NEXT.equals(action)) {
-                playNext();
-            } else if (ACTION_PLAY_LAST.equals(action)) {
+                break;
+            }
+            case ACTION_PLAY_LAST:{
                 playLast();
+                break;
+            }
+            case ACTION_PLAY_NEXT:{
+                playNext();
+                break;
+            }
+            default:{
+                break;
             }
         }
-        return START_STICKY;
     }
+
+//    public int onStartCommand(Intent intent,int flags,int startId){
+//        if (intent != null) {
+//            String action = intent.getAction();
+//            if (ACTION_PLAY_TOGGLE.equals(action)) {
+//                if(mPlayer.isPlaying()){
+//                    pause();
+//                }else{
+//                    rePlay();
+//                }
+//            } else if (ACTION_PLAY_NEXT.equals(action)) {
+//                playNext();
+//            } else if (ACTION_PLAY_LAST.equals(action)) {
+//                playLast();
+//            }
+//        }
+//        return START_STICKY;
+//    }
 
     //活动就是通过与服务绑定然后利用此方法进行交互返回BInder内部类的实例然后交互
     @Override
@@ -194,29 +242,27 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     }
     //创建通知，使本服务为前台服务，从而不至于被系统回收
     private void showNotification() {
-        // The PendingIntent to launch our activity if the user selects this notification
+
+
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, PlayerActivity.class), 0);
-        //if(notification == null){
-            // Set the info for the views that show in the notification panel.
         Notification notification = new NotificationCompat.Builder(this,"music")
-                    .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
-                    .setWhen(System.currentTimeMillis())  // the time stamp
-                    .setContentIntent(contentIntent)  // The intent to send when the entry is clicked//当点击通知跳到那首歌曲
-                    .setCustomContentView(getSmallContentView())
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setOngoing(true)
-                    .build();
-        startForeground(1, notification);
+                .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
+                .setWhen(System.currentTimeMillis())  // the time stamp
+                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked//当点击通知跳到那首歌曲
+                .setContent(getSmallContentView())
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setOngoing(true)
+                .build();
+        notification.flags = Notification.FLAG_ONGOING_EVENT;
+        manager.notify(1000,notification);
     }
 
 
 
     //通知栏绑定UI
     private RemoteViews getSmallContentView() {
-        if (mContentViewSmall == null) {
-            mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_small);
-            setUpRemoteView(mContentViewSmall);
-        }
+        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_small);
+        setUpRemoteView(mContentViewSmall);
         updateRemoteViews(mContentViewSmall);
         return mContentViewSmall;
     }
@@ -228,9 +274,13 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         remoteView.setImageViewResource(R.id.image_view_play_next, R.drawable.ic_remote_view_play_next);
 
 
-        remoteView.setOnClickPendingIntent(R.id.button_play_last, getPendingIntent(ACTION_PLAY_LAST));
-        remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntent(ACTION_PLAY_NEXT));
-        remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntent(ACTION_PLAY_TOGGLE));
+        remoteView.setOnClickPendingIntent(R.id.button_play_last, getPendingIntentBroadcast(ACTION_PLAY_LAST));
+        remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntentBroadcast(ACTION_PLAY_NEXT));
+        remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntentBroadcast(ACTION_PLAY_TOGGLE));
+
+        remoteView.setImageViewResource(R.id.image_view_play_toggle, R.drawable.ic_remote_view_play);
+        remoteView.setTextViewText(R.id.text_view_name, "AIRAN");
+        remoteView.setTextViewText(R.id.text_view_artist, "AIRANNNNNNARIA");
     }
 
     private void updateRemoteViews(RemoteViews remoteView) {
@@ -248,13 +298,18 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     }
 
 
-    //getService表示会重新启动此服务
+    private PendingIntent getPendingIntentBroadcast(String action){
+        Intent intent = new Intent(action);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        return pendingIntent;
+    }
+
+    //getService表示会重新启动此服务，因为服务已经创建了，所以
     private PendingIntent getPendingIntent(String action) {
         final ComponentName serviceName = new ComponentName(this, PlayService.class);
         Intent intent = new Intent(action);
         intent.setComponent(serviceName);
         return PendingIntent.getService(this, 0, intent, 0);
-       //return PendingIntent.getService(this, 0, new Intent(action), 0);
     }
 
 }
