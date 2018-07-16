@@ -6,7 +6,46 @@
     android:layout_height="match_parent"
     tools:context=".PlayerActivity"
     android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:gravity="center_vertical">
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <Button
+                android:id="@+id/back_button"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/ic_back"/>
+        </FrameLayout>
 
+        <com.example.a11084919.musicplayerdemo.controlsOv.MarqueeTextView
+            android:id="@+id/txtMusicName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:text="Test"
+            android:gravity="center"
+
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"/>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+        </FrameLayout>
+    </LinearLayout>
     <com.example.a11084919.musicplayerdemo.controlsOv.MarqueeTextView
         android:id="@+id/txtMusic"
         android:layout_width="wrap_content"

@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,6 +27,8 @@ import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
@@ -37,8 +40,11 @@ public class MainActivity extends BaseActivity {
     private TextView scan_result_txt;
     private TextView txtScanning;
     private ImageView imgScan;
+    private Button btnBack;
 
     private MediaMetadataRetriever mmr;
+
+    private List<Music> tempMusicList;
 
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
@@ -59,10 +65,9 @@ public class MainActivity extends BaseActivity {
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //cycleFlag = true;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "music";
@@ -71,31 +76,37 @@ public class MainActivity extends BaseActivity {
             createNotificationChannel(channelId, channelName, importance);
 
         }
-        if(PublicObject.musicList.size() > 0){
+        tempMusicList = new ArrayList<>();
+
+        tempMusicList = DataSupport.findAll(Music.class);
+        if(tempMusicList.size() > 0){
+            PublicObject.musicList = tempMusicList;
             Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
             startActivity(intent);
+            finish();
             return;
-        }else{
-            PublicObject.musicList = DataSupport.findAll(Music.class);
-            if(PublicObject.musicList.size() > 0){
-                Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
-                startActivity(intent);
-                return;
-            }
         }
+
+
 
 
         scan_result_txt = findViewById(R.id.scan_result_txt);
         btnLocalMusic = findViewById(R.id.btnLocalMusic);
         txtScanning = findViewById(R.id.txtScanning);
         imgScan = findViewById(R.id.scan_icon);
+        btnBack = findViewById(R.id.back_button);
+
+
+
 
         btnLocalMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String btnTxt = btnLocalMusic.getText().toString();
                 //再次点击此控件时，静态成员变量musicList中已经存在元素直接跳到播放列表界面
-                if(PublicObject.musicList.size() > 0){
+                if(btnTxt.equals("进入播放列表")){
                     Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+                    finish();
                     startActivity(intent);
                 }else{
                     //初始化MediaMetadataRetriever类获取歌曲相关信息
@@ -112,6 +123,10 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 getFileMusic(files);
+                                if(PublicObject.musicList.size() > 0){
+                                    PublicObject.musicList.clear();
+                                }
+                                PublicObject.musicList = tempMusicList;
                                 mHandler.sendEmptyMessage(1);
                             }
                         }).start();
@@ -119,56 +134,67 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+
     }
+
+
 
     //只获取特定文件夹和根目录下文件的文件名，专辑图片，文件信息
     private void getFileMusic(File[] files){
-        if(files != null){
-            for(File file : files){
-                if(file.isDirectory()){
-                    strShow = file.toString();
-                    mHandler.sendEmptyMessage(0);
-                    getFileMusic(file.listFiles());
-                }else{
-                    strShow = file.toString();
-                    mHandler.sendEmptyMessage(0);
-                    String fileName = file.getName();
-                    if(fileName.endsWith(".mp3") || fileName.endsWith(".flac")||fileName.endsWith(".MP3")){
-                        try
-                        {
-                            mmr.setDataSource(file.toString());
-                            Music music = new Music();
-                            String name = fileName.substring(0,fileName.lastIndexOf(".")).toString();
-                            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                            String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-                            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                            //String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                            byte[] pic = mmr.getEmbeddedPicture();
+        try
+        {
+            if(files != null){
+                for(File file : files){
+                    if(file.isDirectory()){
+                        strShow = file.toString();
+                        mHandler.sendEmptyMessage(0);
+                        getFileMusic(file.listFiles());
+                    }else{
+                        strShow = file.toString();
+                        mHandler.sendEmptyMessage(0);
+                        String fileName = file.getName();
+                        if(fileName.endsWith(".mp3") || fileName.endsWith(".flac")||fileName.endsWith(".MP3")){
 
-                            music.setPath(file.toString());
-                            music.setName(name);
-                            if(title == null){
-                                title = fileName.substring(fileName.lastIndexOf("-") + 2,fileName.lastIndexOf(".")).toString();
-                                artist = fileName.substring(0,fileName.lastIndexOf("-")-1);
-                            }
-                            music.setTitle(title);
-                            music.setAlbum(album);
-                            music.setArtist(artist);
-                            if(pic != null){
-                                music.setPic(pic);
-                            }
-                            music.save();
-                            PublicObject.musicList.add(music);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                                mmr.setDataSource(file.toString());
+                                Music music = new Music();
+                                String name = fileName.substring(0,fileName.lastIndexOf(".")).toString();
+                                String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                                String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+                                String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+                                //String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                                byte[] pic = mmr.getEmbeddedPicture();
 
+                                music.setPath(file.toString());
+                                music.setName(name);
+                                if(title == null){
+                                    title = fileName.substring(fileName.lastIndexOf("-") + 2,fileName.lastIndexOf(".")).toString();
+                                    artist = fileName.substring(0,fileName.lastIndexOf("-")-1);
+                                }
+                                music.setTitle(title);
+                                music.setAlbum(album);
+                                music.setArtist(artist);
+                                if(pic != null){
+                                    music.setPic(pic);
+                                }
+                                music.save();
+                                tempMusicList.add(music);
+                            }
+                        }
                     }
-                }
 
+                }
             }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -187,6 +213,11 @@ public class MainActivity extends BaseActivity {
                         public void run() {
                             getFileMusic(files);
                             mHandler.sendEmptyMessage(1);
+
+                            if(PublicObject.musicList.size() > 0){
+                                PublicObject.musicList.clear();
+                            }
+                            PublicObject.musicList = tempMusicList;
                         }
                     }).start();
                 }else{

@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -27,23 +30,26 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     //MediaPlayer实例化的对象必须手动mediaPlayer.stop(); mediaPlayer.release();释放，即使当前活动
     ////
     private static String TAG = "PlayerActivity";
-    
+
+    private TextView txtMusicName;
     private TextView txtMusic;
     private SeekBar SBMusicInfo;
     private TextView txtTimeNow;
     private TextView txtTimeMax;
 
+
     private Button btnPlay;
     private Button btnPause;
     private Button btnPre;
     private Button btnNext;
+    private Button btnBack;
     private ImageView imgShow;
     Bitmap bmpMp3;
 
     private boolean notiFlag;
 
-    private String path;
-    private String name;
+    //private String path;
+    //private String name;
     private int position;
 
 
@@ -75,6 +81,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
+        txtMusicName = findViewById(R.id.txtMusicName);
         txtMusic = findViewById(R.id.txtMusic);
         SBMusicInfo = findViewById(R.id.SBMusicInfo);
         txtTimeNow = findViewById(R.id.txtTimeNow);
@@ -83,9 +90,14 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         btnPause = findViewById(R.id.btnPause);
         btnPre = findViewById(R.id.btnPre);
         btnNext = findViewById(R.id.btnNext);
+        btnBack = findViewById(R.id.back_button);
         imgShow = findViewById(R.id.imgShow);
 
-
+        //使图片按照anim中img_animation.xml设置的参数进行旋转··
+        Animation animation = AnimationUtils.loadAnimation(this,R.anim.img_animation);
+        LinearInterpolator lin = new LinearInterpolator();
+        animation.setInterpolator(lin);
+        imgShow.startAnimation(animation);
        //绑定本活动与服务
         bindPlayService();
 
@@ -121,7 +133,12 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
             }
         });
 
-
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onKeyDown(KeyEvent.KEYCODE_BACK,null );
+            }
+        });
 
         SBMusicInfo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -150,23 +167,26 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     public void initMusicMedia(){
         //初期处理
         Intent intent = getIntent();
-        name = intent.getStringExtra("extra_name");
-        if(name == null){
+        String strPosition = intent.getStringExtra("extra_position");
+
+        //name = intent.getStringExtra("extra_name");
+        if(strPosition == null){//当由通知点进来时只需要更新播放类中position即可，其他不需要更新
             notiFlag = true;
-            path = mPlayer.getMusicPath();
-            name = mPlayer.getMusicName();
+//            path = mPlayer.getMusicPath();
+//            name = mPlayer.getMusicName();
+            String tempPath = mPlayer.getCurrentMusic().getPath();
             boolean tempFlag = false;
             int n = PublicObject.musicList.size();
             //因为有可能删除导致mPlayer中保存的position不是歌曲在静态成员变量musicList中歌曲实际位置
             for(int i = 0;i<n;i++){
-                if(path.equals(PublicObject.musicList.get(i).getPath())){
+                if(tempPath.equals(PublicObject.musicList.get(i).getPath())){
                     position = i;
                     tempFlag = true;
                     break;
                 }
             }
             if(!tempFlag){
-                position = 0;
+                position = -1;
             }
 
             //position = mPlayer.getPosition();
@@ -176,24 +196,32 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
             }
         }else{
             notiFlag = false;
-            path = intent.getStringExtra("extra_path");
-            position =Integer.parseInt(intent.getStringExtra("extra_position")) ;
+            position =Integer.parseInt(strPosition) ;
+            //path = intent.getStringExtra("extra_path");
+            //position =Integer.parseInt(intent.getStringExtra("extra_position")) ;
+
+
         }
-        bmpMp3 = Functivity.getCover(path);
+        String tempMusicPath = PublicObject.musicList.get(position).getPath();
+        if(notiFlag){
+            mPlayer.play(position,tempMusicPath,true);
+        }else{
+            mPlayer.play(position,tempMusicPath,false);
+        }
+
+
+        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
         }else{
             imgShow.setImageBitmap(bmpMp3);
         }
 
+        txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
+        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
 
-        txtMusic.setText(name);
 
-        if(notiFlag){
-            mPlayer.play(path,name,position,true);
-        }else{
-            mPlayer.play(path,name,position,false);
-        }
+
         int time = mPlayer.getDuration();
         //播放器暂停状态进入时刷新一下界面
         if(!mPlayer.isPlaying()){
@@ -224,6 +252,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     }
 
     private void unbindPlaybackService(){
+        //并不会调用onServiceDisconnected方法
         unbindService(connection);
         mPlayer.unregisterCallback(PlayerActivity.this);
     }
@@ -255,16 +284,14 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
 
-//        if(position == 0){
-//            position = PublicObject.musicList.size();
-//        }
-//        position--;
+        txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
+        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
 
         position = mPlayer.getPosition();
-
-        txtMusic.setText( PublicObject.musicList.get(position).getName());
-        String tempPath = PublicObject.musicList.get(position).getPath();
-        bmpMp3 = Functivity.getCover(tempPath);
+//        txtMusic.setText( PublicObject.musicList.get(position).getName());
+//        txtMusicName.setText(PublicObject.musicList.get(position).getTitle());
+        //String tempPath = PublicObject.musicList.get(position).getPath();
+        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
         }else{
@@ -280,11 +307,15 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
 
+        txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
+        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
+
         position = mPlayer.getPosition();
 
-        txtMusic.setText( PublicObject.musicList.get(position).getName());
-        String tempPath = PublicObject.musicList.get(position).getPath();
-        bmpMp3 = Functivity.getCover(tempPath);
+//        txtMusic.setText( PublicObject.musicList.get(position).getName());
+//        txtMusicName.setText(PublicObject.musicList.get(position).getTitle());
+//        String tempPath = PublicObject.musicList.get(position).getPath();
+        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
         }else{
@@ -307,6 +338,11 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     }
 
     public void onUpdateProgressBar(){
+
+//        imgShow.setPivotX(imgShow.getWidth()/2);
+//        imgShow.setPivotY(imgShow.getHeight()/2);
+//        imgShow.setRotation(90);
+
         int position = mPlayer.getProgress();
         int time = mPlayer.getDuration();
         int max = SBMusicInfo.getMax();

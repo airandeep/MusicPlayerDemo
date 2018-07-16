@@ -11,8 +11,10 @@ public class Music extends DataSupport{
     private boolean isSelect;
 
     private String path;
-    //演唱者和歌曲名
+    //演唱者和歌曲名//临时使用
     private String name;
+
+
     //演唱者
     private String artist;
     //歌曲名

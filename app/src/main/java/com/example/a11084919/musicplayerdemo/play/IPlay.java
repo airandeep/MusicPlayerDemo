@@ -2,11 +2,14 @@ package com.example.a11084919.musicplayerdemo.play;
 
 import android.content.Context;
 
+import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+
 public interface IPlay {
-    boolean play(String musicPath,String musicName,int position,boolean notiFlag);
+    boolean play(int position,String musicPath,boolean notiFlag);
 
     //获取当前歌曲在歌曲列表中位置
     int getPosition();
+    Music getCurrentMusic();
     //
     //获取当前歌曲播放路径
     String getMusicPath();

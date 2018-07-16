@@ -2,7 +2,6 @@ package com.example.a11084919.musicplayerdemo.musicAdapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -22,7 +20,6 @@ import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
-import com.example.a11084919.musicplayerdemo.general.PublicObject;
 
 import org.litepal.crud.DataSupport;
 
@@ -74,13 +71,13 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
-                    Music music = mMusicList.get(position);
-                    String name = music.getName();
-                    String path = music.getPath();
+                   // Music music = mMusicList.get(position);
+//                    String name = music.getName();
+//                    String path = music.getPath();
                     Context context = v.getContext();
                     Intent intent = new Intent();
-                    intent.putExtra("extra_name", name);
-                    intent.putExtra("extra_path", path);
+//                    intent.putExtra("extra_name", name);
+//                    intent.putExtra("extra_path", path);
                     intent.putExtra("extra_position", String.valueOf(position));
                     intent.setClass(context, PlayerActivity.class);
 
@@ -175,13 +172,13 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         // View当前PopupMenu显示的相对View的位置
         PopupMenu popupMenu = new PopupMenu(mContext, view,Gravity.END | Gravity.BOTTOM);
         // menu布局
-        popupMenu.inflate(R.menu.main);
+        popupMenu.inflate(R.menu.menu);
         // menu的item点击事件
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.music_name_item:{
+                    case R.id.delete_item:{
                         Music music = mMusicList.get(position);
                         mMusicList.remove(position);
                         //移除适配器中的内容即使notifyDataSetChanged刷新一下

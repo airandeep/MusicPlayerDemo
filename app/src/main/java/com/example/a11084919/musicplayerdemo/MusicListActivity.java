@@ -1,10 +1,13 @@
 package com.example.a11084919.musicplayerdemo;
 
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -27,6 +30,8 @@ public class MusicListActivity extends BaseActivity {
     private LinearLayout LinOutButton;
     private Button btnChooseAll;
     private Button btnDelete;
+    private Button btnBack;
+    private Button btnHome;
 
     public static final int STATE_PLAY_ENABLE = 0;
     public static final int STATE_MANAGE = 1;
@@ -46,12 +51,12 @@ public class MusicListActivity extends BaseActivity {
         adapterPlus = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
         recyclerView.setAdapter(adapterPlus);
 
-
-
         btnManage = findViewById(R.id.btnManage);
         LinOutButton = findViewById(R.id.LinOutButton);
         btnChooseAll = findViewById(R.id.btnChooseAll);
         btnDelete = findViewById(R.id.btnDelete);
+        btnBack = findViewById(R.id.back_button);
+        btnHome = findViewById(R.id.home_button);
 
         int n = PublicObject.musicList.size(),count = 0;
         for(int i = 0;i<n;i++){
@@ -149,8 +154,23 @@ public class MusicListActivity extends BaseActivity {
             }
         });
 
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onKeyDown(KeyEvent.KEYCODE_BACK,null );
+            }
+        });
 
 
+        btnHome.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                DataSupport.deleteAll(Music.class);
+                Intent intent = new Intent(MusicListActivity.this,MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -173,8 +193,24 @@ public class MusicListActivity extends BaseActivity {
         return true;
     }
 
-
-
-
-
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu1,menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()){
+//            case R.id.scanning_item:{
+//
+//                break;
+//            }
+//            default:{
+//                break;
+//            }
+//
+//        }
+//        return true;
+//    }
 }

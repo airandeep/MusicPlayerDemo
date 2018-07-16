@@ -23,6 +23,14 @@ public class Player implements IPlay {
     private String musicPath;
     private String musicName;
 
+    private Music currentMusic;
+
+    public Music getCurrentMusic() {
+        return currentMusic;
+    }
+    public void setCurrentMusic(Music currentMusic) {
+        this.currentMusic = currentMusic;
+    }
 
     //因为PlayService也继承了此接口mCallbacks，所以可以将服务实例化对象存在此集合mCallbacks中
     //然后在使用
@@ -55,20 +63,21 @@ public class Player implements IPlay {
         return sInstance;
     }
 
-    public boolean play(String musicPath,String musicName,int position,boolean notiFlag){
-
-        //
-        if(notiFlag || musicPath.equals(this.musicPath)){
+    public boolean play(int position,String musicPath,boolean notiFlag){
+        if(notiFlag || musicPath.equals(getCurrentMusic() == null ? "" : getCurrentMusic().getPath())){
             //当再次有播放列表点进来时由于有可能删除导致歌曲在链表list中的位置产生变化，所以更新一波
             this.position = position;
             return true;
         }else{
-            this.musicPath = musicPath;
-            this.musicName = musicName;
+            Music music = PublicObject.musicList.get(position);
+            setCurrentMusic(music);
+
+//            this.musicPath = musicPath;
+//            this.musicName = musicName;
             this.position = position;
             try {
                 mediaPlayer.reset();
-                mediaPlayer.setDataSource(musicPath);
+                mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();
                 mediaPlayer.start();
                 notifyPlayStatusChanged();
@@ -123,17 +132,19 @@ public class Player implements IPlay {
 
     public boolean playLast(){
         //解决删除问题
-        if(position == 0 || position >= PublicObject.musicList.size()-1){
+        if(position == -1 || position >= PublicObject.musicList.size()){
             position = PublicObject.musicList.size();
         }
         position--;
-        musicPath = PublicObject.musicList.get(position).getPath();
-        musicName = PublicObject.musicList.get(position).getName();
+//        musicPath = PublicObject.musicList.get(position).getPath();
+//        musicName = PublicObject.musicList.get(position).getName();
+        Music music = PublicObject.musicList.get(position);
+        setCurrentMusic(music);
         try {
             //切歌时必须先stop；
             mediaPlayer.stop();
             mediaPlayer.reset();
-            mediaPlayer.setDataSource(musicPath);
+            mediaPlayer.setDataSource(getCurrentMusic().getPath());
             mediaPlayer.prepare();
             mediaPlayer.start();
             notifyPlayLast();//通过服务中存储的活动的实例化对象调用活动中的重写的onSwitchLast方法
@@ -150,12 +161,16 @@ public class Player implements IPlay {
         }
         position++;
 
-        musicPath = PublicObject.musicList.get(position).getPath();
-        musicName = PublicObject.musicList.get(position).getName();
+//        musicPath = PublicObject.musicList.get(position).getPath();
+//        musicName = PublicObject.musicList.get(position).getName();
+
+        Music music = PublicObject.musicList.get(position);
+        setCurrentMusic(music);
+
         try {
             mediaPlayer.stop();
             mediaPlayer.reset();
-            mediaPlayer.setDataSource(musicPath);
+            mediaPlayer.setDataSource(getCurrentMusic().getPath());
             mediaPlayer.prepare();
             mediaPlayer.start();
             notifyPlayNext();//通过服务中存储的活动的实例化对象调用活动中的重写的onSwitchNext方法

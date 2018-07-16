@@ -80,7 +80,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     };
 
     public void onCreate() {
-        Log.d(TAG, "onCreate: ");
         super.onCreate();
         manager = (NotificationManager)getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
         mPlayer = Player.getInstance();
@@ -134,23 +133,23 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         }
     }
 
-//    public int onStartCommand(Intent intent,int flags,int startId){
-//        if (intent != null) {
-//            String action = intent.getAction();
-//            if (ACTION_PLAY_TOGGLE.equals(action)) {
-//                if(mPlayer.isPlaying()){
-//                    pause();
-//                }else{
-//                    rePlay();
-//                }
-//            } else if (ACTION_PLAY_NEXT.equals(action)) {
-//                playNext();
-//            } else if (ACTION_PLAY_LAST.equals(action)) {
-//                playLast();
-//            }
-//        }
-//        return START_STICKY;
-//    }
+    public int onStartCommand(Intent intent,int flags,int startId){
+        if (intent != null) {
+            String action = intent.getAction();
+            if (ACTION_PLAY_TOGGLE.equals(action)) {
+                if(mPlayer.isPlaying()){
+                    pause();
+                }else{
+                    rePlay();
+                }
+            } else if (ACTION_PLAY_NEXT.equals(action)) {
+                playNext();
+            } else if (ACTION_PLAY_LAST.equals(action)) {
+                playLast();
+            }
+        }
+        return START_STICKY;
+    }
 
     //活动就是通过与服务绑定然后利用此方法进行交互返回BInder内部类的实例然后交互
     @Override
@@ -159,14 +158,16 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         return binder;
     }
 
-    public boolean play(String musicPath,String musicName,int position,boolean notiFlag){
-        return mPlayer.play(musicPath,musicName,position,notiFlag);
+    public boolean play(int position,String musicPath,boolean notiFlag){
+        return mPlayer.play(position,musicPath,notiFlag);
     }
 
 
     public int getPosition() {
         return mPlayer.getPosition();
     }
+
+    public  Music getCurrentMusic(){return mPlayer.getCurrentMusic();}
 
     public String getMusicPath(){
         return mPlayer.getMusicPath();
@@ -239,6 +240,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
             mPlayer.playNext();
         }
+
+        //showNotification();
     }
     //创建通知，使本服务为前台服务，从而不至于被系统回收
     private void showNotification() {
@@ -278,23 +281,24 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntentBroadcast(ACTION_PLAY_NEXT));
         remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntentBroadcast(ACTION_PLAY_TOGGLE));
 
-        remoteView.setImageViewResource(R.id.image_view_play_toggle, R.drawable.ic_remote_view_play);
-        remoteView.setTextViewText(R.id.text_view_name, "AIRAN");
-        remoteView.setTextViewText(R.id.text_view_artist, "AIRANNNNNNARIA");
     }
 
     private void updateRemoteViews(RemoteViews remoteView) {
         remoteView.setImageViewResource(R.id.image_view_play_toggle, isPlaying()
                 ? R.drawable.ic_remote_view_pause : R.drawable.ic_remote_view_play);
-        String tempPath = PublicObject.musicList.get(getPosition()).getPath();
-        Bitmap bmpMp3 = Functivity.getCover(tempPath);
+        //String tempPath = mPlayer.getCurrentMusic().getPath();
+        Bitmap bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             remoteView.setImageViewResource(R.id.image_view_album,R.drawable.picture_default);
         }else{
             remoteView.setImageViewBitmap(R.id.image_view_album,bmpMp3 );
         }
-        remoteView.setTextViewText(R.id.text_view_name, PublicObject.musicList.get(getPosition()).getTitle());
-        remoteView.setTextViewText(R.id.text_view_artist, PublicObject.musicList.get(getPosition()).getArtist());
+        remoteView.setTextViewText(R.id.text_view_name, mPlayer.getCurrentMusic().getTitle());
+        remoteView.setTextViewText(R.id.text_view_artist, mPlayer.getCurrentMusic().getArtist());
+
+//        int position = mPlayer.getProgress();
+//        int time = mPlayer.getDuration();
+//        remoteView.setProgressBar(R.id.PBMusicInfo,200,200*position/time,false);
     }
 
 
@@ -305,7 +309,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     }
 
     //getService表示会重新启动此服务，因为服务已经创建了，所以
-    private PendingIntent getPendingIntent(String action) {
+    private PendingIntent getPendingIntentService(String action) {
         final ComponentName serviceName = new ComponentName(this, PlayService.class);
         Intent intent = new Intent(action);
         intent.setComponent(serviceName);
