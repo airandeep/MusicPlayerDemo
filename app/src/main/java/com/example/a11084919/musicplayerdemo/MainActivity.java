@@ -3,24 +3,26 @@ package com.example.a11084919.musicplayerdemo;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 
@@ -41,6 +43,7 @@ public class MainActivity extends BaseActivity {
     private TextView txtScanning;
     private ImageView imgScan;
     private Button btnBack;
+    private ProgressBar pbScanning;
 
     private MediaMetadataRetriever mmr;
 
@@ -53,6 +56,9 @@ public class MainActivity extends BaseActivity {
                     scan_result_txt.setText(strShow);
                     break;
                 case 1:
+                    imgScan.setVisibility(View.VISIBLE);
+                    pbScanning.setVisibility(View.GONE);
+
                     imgScan.setImageResource(R.drawable.local_scan_ok);
                     txtScanning.setText("已扫描"+ PublicObject.musicList.size() + "首歌曲");
                     btnLocalMusic.setVisibility(View.VISIBLE);
@@ -76,16 +82,20 @@ public class MainActivity extends BaseActivity {
             createNotificationChannel(channelId, channelName, importance);
 
         }
+        Intent intentJus = getIntent();
+        String flag = intentJus.getStringExtra("extra_flag");
         tempMusicList = new ArrayList<>();
-
-        tempMusicList = DataSupport.findAll(Music.class);
-        if(tempMusicList.size() > 0){
-            PublicObject.musicList = tempMusicList;
-            Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
-            startActivity(intent);
-            finish();
-            return;
+        if(flag == null){
+            tempMusicList = DataSupport.findAll(Music.class);
+            if(tempMusicList.size() > 0){
+                PublicObject.musicList = tempMusicList;
+                Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            }
         }
+
 
 
 
@@ -95,7 +105,7 @@ public class MainActivity extends BaseActivity {
         txtScanning = findViewById(R.id.txtScanning);
         imgScan = findViewById(R.id.scan_icon);
         btnBack = findViewById(R.id.back_button);
-
+        pbScanning = findViewById(R.id.pbScanning);
 
 
 
@@ -109,6 +119,7 @@ public class MainActivity extends BaseActivity {
                     finish();
                     startActivity(intent);
                 }else{
+                    DataSupport.deleteAll(Music.class);
                     //初始化MediaMetadataRetriever类获取歌曲相关信息
                     mmr =  new MediaMetadataRetriever();
                     if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
@@ -116,13 +127,18 @@ public class MainActivity extends BaseActivity {
                     }else{
                         btnLocalMusic.setVisibility(View.GONE);
                         txtScanning.setVisibility(View.VISIBLE);
-                        File path = Environment.getExternalStorageDirectory();// 获得SD卡路径
-                        final File[] files = path.listFiles();// 读取
+
+                        imgScan.setVisibility(View.GONE);
+                        pbScanning.setVisibility(View.VISIBLE);
 
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                getFileMusic(files);
+//                                File path = Environment.getExternalStorageDirectory();// 获得SD卡路径
+//                                final File[] files = path.listFiles();// 读取
+//                                getFileMusic(files);
+
+                                getMusicFileByMediaStore();
                                 if(PublicObject.musicList.size() > 0){
                                     PublicObject.musicList.clear();
                                 }
@@ -131,6 +147,7 @@ public class MainActivity extends BaseActivity {
                             }
                         }).start();
                     }
+
                 }
             }
         });
@@ -146,6 +163,53 @@ public class MainActivity extends BaseActivity {
     }
 
 
+
+    private void getMusicFileByMediaStore()
+    {
+        ContentResolver musicResolver = getContentResolver();
+        Cursor c = null;
+        try {
+            c = musicResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null,
+                 MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+            while (c.moveToNext()) {
+                String path = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));// 路径
+                //有时候会扫描出来不存在的歌曲
+                if(!Functivity.isExists(path)){
+                    continue;
+                }
+                Music music = new Music();
+                mmr.setDataSource(path);
+
+                String fileName = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)); // 文件名
+                String name = fileName.substring(0,fileName.lastIndexOf(".")).toString();//歌曲名
+                String album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)); // 专辑
+                String artist = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)); // 作者
+                String title = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));//歌曲名字
+                byte[] pic = mmr.getEmbeddedPicture();
+
+                music.setPath(path);
+                music.setName(name);
+                if(artist.equals("<unknown>")){
+                    artist = fileName.substring(0,fileName.lastIndexOf("-")-1);
+                    title = fileName.substring(fileName.lastIndexOf("-") + 2,fileName.lastIndexOf(".")).toString();
+                }
+                music.setAlbum(album);
+                music.setArtist(artist);
+                music.setTitle(title);
+                music.setPic(pic);
+                music.save();
+                tempMusicList.add(music);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+    }
 
     //只获取特定文件夹和根目录下文件的文件名，专辑图片，文件信息
     private void getFileMusic(File[] files){
@@ -205,19 +269,23 @@ public class MainActivity extends BaseActivity {
                 if(grantsResults.length > 0 && grantsResults[0] == PackageManager.PERMISSION_GRANTED){
                     btnLocalMusic.setVisibility(View.GONE);
                     txtScanning.setVisibility(View.VISIBLE);
-                    File path = Environment.getExternalStorageDirectory();// 获得SD卡路径
-                    final File[] files = path.listFiles();// 读取
+
+                    imgScan.setVisibility(View.GONE);
+                    pbScanning.setVisibility(View.VISIBLE);
 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            getFileMusic(files);
-                            mHandler.sendEmptyMessage(1);
+//                            File path = Environment.getExternalStorageDirectory();// 获得SD卡路径
+//                            final File[] files = path.listFiles();// 读取
+//                            getFileMusic(files);
 
+                            getMusicFileByMediaStore();
                             if(PublicObject.musicList.size() > 0){
                                 PublicObject.musicList.clear();
                             }
                             PublicObject.musicList = tempMusicList;
+                            mHandler.sendEmptyMessage(1);
                         }
                     }).start();
                 }else{

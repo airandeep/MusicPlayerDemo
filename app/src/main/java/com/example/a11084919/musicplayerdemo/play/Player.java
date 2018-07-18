@@ -14,14 +14,26 @@ import java.util.List;
 
 public class Player implements IPlay {
 
+    public static final int LISTLOOP = 0;
+    public static final int SINGLELOOP = 1;
+    public static final int RANDLOOP = 2;
+
     private static volatile Player sInstance;
     private MediaPlayer mediaPlayer;
 
     //当前歌曲位置//一定要保证此变量在删除歌曲后保持正确
     private int position;
-    //当前歌曲路径
-    private String musicPath;
-    private String musicName;
+    //播放模式
+    private int playMode;
+
+    public int getPlayMode() {
+        return playMode;
+    }
+
+    public void setPlayMode(int playMode) {
+        this.playMode = playMode;
+    }
+
 
     private Music currentMusic;
 
@@ -38,19 +50,13 @@ public class Player implements IPlay {
 
     private Player(){
         mediaPlayer = new MediaPlayer();//media刚创建时处于Idle状态
+        //mediaPlayer.setLooping(true);
     }
 
     public int getPosition() {
         return position;
     }
 
-    public String getMusicPath(){
-        return musicPath;
-    }
-
-    public String getMusicName(){
-        return musicName;
-    }
 
     public static Player getInstance(){
         if(sInstance == null){
@@ -63,6 +69,8 @@ public class Player implements IPlay {
         return sInstance;
     }
 
+
+
     public boolean play(int position,String musicPath,boolean notiFlag){
         if(notiFlag || musicPath.equals(getCurrentMusic() == null ? "" : getCurrentMusic().getPath())){
             //当再次有播放列表点进来时由于有可能删除导致歌曲在链表list中的位置产生变化，所以更新一波
@@ -72,10 +80,9 @@ public class Player implements IPlay {
             Music music = PublicObject.musicList.get(position);
             setCurrentMusic(music);
 
-//            this.musicPath = musicPath;
-//            this.musicName = musicName;
             this.position = position;
             try {
+                mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();
@@ -91,6 +98,19 @@ public class Player implements IPlay {
 
     }
 
+    public boolean playCurrentSong(){
+        try {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(getCurrentMusic().getPath());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
 
     public void registerCallback(Callback callback){
         mCallbacks.add(callback);
@@ -131,57 +151,80 @@ public class Player implements IPlay {
     }
 
     public boolean playLast(){
-        //解决删除问题
-        if(position == -1 || position >= PublicObject.musicList.size()){
-            position = PublicObject.musicList.size();
+        int flag = getPlayMode();
+        if(flag == Player.LISTLOOP){
+            //解决删除问题
+            if(position == 0 ||position == -1 || position >= PublicObject.musicList.size()){
+                position = PublicObject.musicList.size();
+            }
+            position--;
+            Music music = PublicObject.musicList.get(position);
+            setCurrentMusic(music);
+            try {
+                //切歌时必须先stop；
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(getCurrentMusic().getPath());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                notifyPlayLast();//通过服务中存储的活动的实例化对象调用活动中的重写的onSwitchLast方法
+            } catch (IOException e) {
+                return false;
+            }
+            return true;
+        }else if(flag == Player.SINGLELOOP){
+            playCurrentSong();
+        }else if(flag == Player.RANDLOOP){
+            int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
+            play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
         }
-        position--;
-//        musicPath = PublicObject.musicList.get(position).getPath();
-//        musicName = PublicObject.musicList.get(position).getName();
-        Music music = PublicObject.musicList.get(position);
-        setCurrentMusic(music);
-        try {
-            //切歌时必须先stop；
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(getCurrentMusic().getPath());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-            notifyPlayLast();//通过服务中存储的活动的实例化对象调用活动中的重写的onSwitchLast方法
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public boolean playNext(){
-        //解决删除问题
-        if(position >= PublicObject.musicList.size()-1){
-            position = -1;
+        int flag = getPlayMode();
+        if(flag == Player.LISTLOOP){
+            //解决删除问题
+            if(position >= PublicObject.musicList.size()-1){
+                position = -1;
+            }
+            position++;
+            Music music = PublicObject.musicList.get(position);
+            setCurrentMusic(music);
+
+            try {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(getCurrentMusic().getPath());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                notifyPlayNext();//通过服务中存储的活动的实例化对象调用活动中的重写的onSwitchNext方法
+            } catch (IOException e) {
+                return false;
+            }
+            return true;
+        }else if(flag == Player.SINGLELOOP){
+            playCurrentSong();
+        }else if(flag == Player.RANDLOOP){
+            int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
+            play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
         }
-        position++;
+        return false;
 
-//        musicPath = PublicObject.musicList.get(position).getPath();
-//        musicName = PublicObject.musicList.get(position).getName();
 
-        Music music = PublicObject.musicList.get(position);
-        setCurrentMusic(music);
 
-        try {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(getCurrentMusic().getPath());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-            notifyPlayNext();//通过服务中存储的活动的实例化对象调用活动中的重写的onSwitchNext方法
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
     }
 
     public void initNotification(){}
 
+    @Override
+    public void releasePlayer() {
+
+        mediaPlayer.reset();
+        mediaPlayer.release();
+        mediaPlayer = null;
+        sInstance = null;
+    }
 
     private void notifyPlayStatusChanged() {
         for (Callback callback : mCallbacks) {

@@ -89,6 +89,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         filter.addAction(ACTION_PLAY_TOGGLE);
         filter.addAction(ACTION_PLAY_LAST);
         filter.addAction(ACTION_PLAY_NEXT);
+        filter.addAction(ACTION_STOP_SERVICE);
         registerReceiver(mIntentReceiver,filter);
 
 
@@ -127,6 +128,13 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                 playNext();
                 break;
             }
+            case ACTION_STOP_SERVICE:{
+                if(isPlaying()){
+                    pause();
+                }
+                manager.cancel(1000);
+                break;
+            }
             default:{
                 break;
             }
@@ -151,6 +159,11 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         return START_STICKY;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     //活动就是通过与服务绑定然后利用此方法进行交互返回BInder内部类的实例然后交互
     @Override
     public IBinder onBind(Intent intent) {
@@ -162,20 +175,21 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         return mPlayer.play(position,musicPath,notiFlag);
     }
 
+    public boolean playCurrentSong(){
+        return mPlayer.playCurrentSong();
+    }
 
     public int getPosition() {
         return mPlayer.getPosition();
     }
 
+    public int getPlayMode(){return mPlayer.getPlayMode();}
+
+    public void setPlayMode(int playMode){
+        mPlayer.setPlayMode(playMode);
+    }
+
     public  Music getCurrentMusic(){return mPlayer.getCurrentMusic();}
-
-    public String getMusicPath(){
-        return mPlayer.getMusicPath();
-    }
-
-    public String getMusicName(){
-        return mPlayer.getMusicName();
-    }
 
     public void registerCallback(Callback callback) {
         mPlayer.registerCallback(callback);
@@ -221,6 +235,10 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         showNotification();
     }
 
+    public void releasePlayer() {
+        mPlayer.releasePlayer();
+        super.onDestroy();
+    }
     //////////////////////////////////////////////////////////////////
 
     public void onSwitchLast(){
@@ -238,7 +256,18 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         int position = mPlayer.getProgress();
         int time = mPlayer.getDuration();
         if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
-            mPlayer.playNext();
+            int flag = mPlayer.getPlayMode();
+            if(flag == Player.LISTLOOP){
+                mPlayer.playNext();
+            }else if(flag == Player.SINGLELOOP){
+                mPlayer.playCurrentSong();
+            }else if(flag == Player.RANDLOOP){
+                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
+                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
+            }else{
+                mPlayer.playNext();
+            }
+
         }
 
         //showNotification();
@@ -252,7 +281,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                 .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked//当点击通知跳到那首歌曲
-                .setContent(getSmallContentView())
+                .setCustomContentView(getSmallContentView())
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
                 .build();
@@ -264,7 +293,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
     //通知栏绑定UI
     private RemoteViews getSmallContentView() {
-        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_small);
+        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player);
         setUpRemoteView(mContentViewSmall);
         updateRemoteViews(mContentViewSmall);
         return mContentViewSmall;
@@ -273,10 +302,11 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
 
     private void setUpRemoteView(RemoteViews remoteView) {
+        remoteView.setImageViewResource(R.id.image_view_close, R.drawable.ic_remote_view_close);
         remoteView.setImageViewResource(R.id.image_view_play_last, R.drawable.ic_remote_view_play_last);
         remoteView.setImageViewResource(R.id.image_view_play_next, R.drawable.ic_remote_view_play_next);
 
-
+        remoteView.setOnClickPendingIntent(R.id.button_close, getPendingIntentBroadcast(ACTION_STOP_SERVICE));
         remoteView.setOnClickPendingIntent(R.id.button_play_last, getPendingIntentBroadcast(ACTION_PLAY_LAST));
         remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntentBroadcast(ACTION_PLAY_NEXT));
         remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntentBroadcast(ACTION_PLAY_TOGGLE));

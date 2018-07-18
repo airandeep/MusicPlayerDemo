@@ -36,6 +36,10 @@ public class Functivity {
         return bitmap;
     }
 
+    public static boolean isExists(String path) {
+        File file = new File(path);
+        return file.exists();
+    }
 
 
 }

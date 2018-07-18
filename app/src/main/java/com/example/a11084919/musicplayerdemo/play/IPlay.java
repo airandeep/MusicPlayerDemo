@@ -7,14 +7,16 @@ import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 public interface IPlay {
     boolean play(int position,String musicPath,boolean notiFlag);
 
+    boolean playCurrentSong();
     //获取当前歌曲在歌曲列表中位置
     int getPosition();
+
+    int getPlayMode();
+
+    void setPlayMode(int playMode);
+
     Music getCurrentMusic();
-    //
-    //获取当前歌曲播放路径
-    String getMusicPath();
-    //获取当前歌曲播放名字
-    String getMusicName();
+
 
     void registerCallback(Callback callback);
 
@@ -37,6 +39,8 @@ public interface IPlay {
     boolean playNext();
 
     void initNotification();
+
+    void releasePlayer();
 
     //此接口中的接口只有PlayService继承
     interface Callback{

@@ -11,12 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterList;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
 
 import org.litepal.crud.DataSupport;
@@ -26,7 +28,8 @@ public class MusicListActivity extends BaseActivity {
 
     private static String TAG = "MusicListActivity";
     private Button btnManage;
-    private MusicAdapterRecycle adapterPlus;
+    private MusicAdapterRecycle musicAdapterRecycle;
+    private MusicAdapterList musicAdapterList;
     private LinearLayout LinOutButton;
     private Button btnChooseAll;
     private Button btnDelete;
@@ -44,12 +47,18 @@ public class MusicListActivity extends BaseActivity {
         setContentView(R.layout.activity_music_list);
 
 
+
         RecyclerView recyclerView = findViewById(R.id.musicRecycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setNestedScrollingEnabled(false);
 
-        adapterPlus = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
-        recyclerView.setAdapter(adapterPlus);
+        musicAdapterRecycle = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
+        recyclerView.setAdapter(musicAdapterRecycle);
+
+//        musicAdapterList = new MusicAdapterList(MusicListActivity.this,R.layout.music_item,PublicObject.musicList);
+//        ListView listView = findViewById(R.id.musicListView);
+//        listView.setAdapter(musicAdapterList);
 
         btnManage = findViewById(R.id.btnManage);
         LinOutButton = findViewById(R.id.LinOutButton);
@@ -73,7 +82,7 @@ public class MusicListActivity extends BaseActivity {
             public void onClick(View v){
                 btnManage.setVisibility(View.GONE);
                 LinOutButton.setVisibility(View.VISIBLE);
-                adapterPlus.setEditMode(1);
+                musicAdapterRecycle.setEditMode(1);
                 stateNow = STATE_MANAGE;
             }
         });
@@ -93,7 +102,7 @@ public class MusicListActivity extends BaseActivity {
                     }
                     btnChooseAll.setText("全选");
                 }
-                adapterPlus.notifyDataSetChanged();
+                musicAdapterRecycle.notifyDataSetChanged();
             }
         });
 
@@ -132,17 +141,16 @@ public class MusicListActivity extends BaseActivity {
 
                     sure.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                            for(int i = adapterPlus.getMyMusicList().size()-1;i>=0;i--){
-                                Music music = adapterPlus.getMyMusicList().get(i);
+                            for(int i = musicAdapterRecycle.getMyMusicList().size()-1;i>=0;i--){
+                                Music music = musicAdapterRecycle.getMyMusicList().get(i);
                                 if(music.isSelect()){
-                                    adapterPlus.getMyMusicList().remove(music);
+                                    musicAdapterRecycle.getMyMusicList().remove(music);
                                     Functivity.deleteFile(music.getPath());
                                     DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
                                 }
                             }
-                            adapterPlus.notifyDataSetChanged();
+                            musicAdapterRecycle.notifyDataSetChanged();
 
-                            //adapterPlus.setEditMode(1);
                             dialog.dismiss();
                             Toast.makeText(view.getContext(),"删除成功",Toast.LENGTH_SHORT).show();
                         }
@@ -165,8 +173,8 @@ public class MusicListActivity extends BaseActivity {
         btnHome.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                DataSupport.deleteAll(Music.class);
                 Intent intent = new Intent(MusicListActivity.this,MainActivity.class);
+                intent.putExtra("extra_flag", "true");
                 startActivity(intent);
                 finish();
             }
@@ -180,7 +188,7 @@ public class MusicListActivity extends BaseActivity {
                 if(stateNow == STATE_MANAGE){
                     btnManage.setVisibility(View.VISIBLE);
                     LinOutButton.setVisibility(View.GONE);
-                    adapterPlus.setEditMode(0);
+                    musicAdapterRecycle.setEditMode(0);
                     stateNow = STATE_PLAY_ENABLE;
                 }else{
                     ActivityCollector.finishAll();
@@ -193,7 +201,13 @@ public class MusicListActivity extends BaseActivity {
         return true;
     }
 
-//    @Override
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+
+    //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.menu1,menu);
 //        return true;

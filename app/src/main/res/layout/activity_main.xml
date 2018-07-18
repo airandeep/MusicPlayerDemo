@@ -46,7 +46,14 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="80dp"
-            android:src="@drawable/local_scan_scaning"/>
+            android:src="@drawable/local_scan_scaning"
+            android:layout_centerInParent="true"/>
+        <ProgressBar
+            android:id="@+id/pbScanning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
     </RelativeLayout>
     <TextView
         android:id="@+id/txtScanning"
