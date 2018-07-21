@@ -85,17 +85,8 @@ public class MainActivity extends BaseActivity {
         Intent intentJus = getIntent();
         String flag = intentJus.getStringExtra("extra_flag");
 
+        //判断是不是由播放列表活动点击过来的
         if(flag == null){
-//            tempMusicList = DataSupport.findAll(Music.class);
-//            if(tempMusicList.size() > 0){
-//                if(!(PublicObject.musicList.size()>0)){
-//                    PublicObject.musicList = tempMusicList;
-//                }
-//                Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
-//                startActivity(intent);
-//                finish();
-//                return;
-//            }
 
             if(PublicObject.musicList != null){
                 Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
@@ -136,7 +127,9 @@ public class MainActivity extends BaseActivity {
                 //再次点击此控件时，静态成员变量musicList中已经存在元素直接跳到播放列表界面
                 if(btnTxt.equals("进入播放列表")){
                     Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
-                    finish();
+                    //必须关闭掉播放列表活动，然后重新创建，因为数据已经刷新了//由于List已经更新，不能在用之前的适配器了
+                    //finish();
+                    ActivityCollector.finishAll();
                     startActivity(intent);
                 }else{
                     DataSupport.deleteAll(Music.class);
