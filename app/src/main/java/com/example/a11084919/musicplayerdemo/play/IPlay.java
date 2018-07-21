@@ -1,8 +1,7 @@
 package com.example.a11084919.musicplayerdemo.play;
 
-import android.content.Context;
 
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+import com.example.a11084919.musicplayerdemo.model.Music;
 
 public interface IPlay {
     boolean play(int position,String musicPath,boolean notiFlag);

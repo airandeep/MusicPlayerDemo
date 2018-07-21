@@ -1,15 +1,13 @@
 package com.example.a11084919.musicplayerdemo;
 
 import android.content.ComponentName;
-import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -22,13 +20,11 @@ import android.widget.TextView;
 
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
 import com.example.a11084919.musicplayerdemo.play.IPlay;
 import com.example.a11084919.musicplayerdemo.play.PlayService;
 import com.example.a11084919.musicplayerdemo.play.Player;
 
 
-import static android.provider.MediaStore.Video.query;
 import static java.lang.Thread.sleep;
 
 public class PlayerActivity extends BaseActivity implements IPlay.Callback{
@@ -306,12 +302,18 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        AudioManager audioManager  = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:
                 finish();
                 Intent intent = new Intent(PlayerActivity.this,MusicListActivity.class);
                 startActivity(intent);
                 break;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,AudioManager.FX_FOCUS_NAVIGATION_UP);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,AudioManager.FX_FOCUS_NAVIGATION_UP);
             default:
                 break;
         }
@@ -378,10 +380,11 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         txtTimeMax.setText(str);
     }
     public void onPlayStatusChanged() {
-
         imgShow.clearAnimation();
-        //使图片按照anim中img_animation.xml设置的参数进行旋转··
-        imgShow.startAnimation(animation);
+        if(mPlayer.isPlaying()){
+            //使图片按照anim中img_animation.xml设置的参数进行旋转··
+            imgShow.startAnimation(animation);
+        }
 
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);

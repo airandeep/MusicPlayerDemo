@@ -4,12 +4,12 @@
     android:orientation="horizontal"
     android:background="#1ADDF9FF"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="70dp"
     android:layout_margin="1dp">
 
     <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
     <LinearLayout
         android:id="@+id/btnOk"
         android:layout_height="match_parent"
@@ -25,25 +25,42 @@
             android:layout_marginRight="12dp"
             android:visibility="gone"/>
         <!--<ImageView-->
-            <!--android:id="@+id/imgPlaying"-->
-            <!--android:layout_width="40dp"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:src="@drawable/playing"-->
-            <!--android:visibility="gone"/>-->
-        <!--<ImageView-->
-            <!--android:id="@+id/imgAlbum"-->
-            <!--android:layout_width="40dp"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:src="@drawable/airan_launch"/>-->
-        <TextView
-            android:id="@+id/music_name"
+        <!--android:id="@+id/imgPlaying"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:src="@drawable/playing"-->
+        <!--android:visibility="gone"/>-->
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/imgAlbum"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:src="@drawable/airan_launch"/>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
-            android:textSize="20dp"
-            android:text="菊花台"
-            android:singleLine="true"/>
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp">
+
+            <TextView
+                android:id="@+id/music_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:text="菊花台"
+                android:textSize="26dp"/>
+            <TextView
+                android:id="@+id/music_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textSize="18dp"
+                android:text="周杰伦"/>
+        </LinearLayout>
+
     </LinearLayout>
 
     <FrameLayout
@@ -65,12 +82,12 @@
             />
     </FrameLayout>
     <!--<Button-->
-        <!--android:id="@+id/btnMusicDelete"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textSize="20dp"-->
-        <!--android:layout_gravity="center_vertical"-->
-        <!--android:text="DELETE"/>-->
+    <!--android:id="@+id/btnMusicDelete"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textSize="20dp"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:text="DELETE"/>-->
 
 
 </LinearLayout>

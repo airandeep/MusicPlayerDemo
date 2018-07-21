@@ -3,6 +3,7 @@ package com.example.a11084919.musicplayerdemo.musicAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.model.Music;
 
 import org.litepal.crud.DataSupport;
 
@@ -40,16 +42,19 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
         LinearLayout btnOk;
         TextView txtMusicName;
+        TextView txtMusicArtist;
         CheckBox ckChoose;
         FrameLayout btnMusicDelete;
-
+        ImageView imgAlbum;
 
         public ViewHolder(View view) {
             super(view);
             btnOk = view.findViewById(R.id.btnOk);
             txtMusicName = view.findViewById(R.id.music_name);
+            txtMusicArtist = view.findViewById(R.id.music_artist);
             btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
             ckChoose = view.findViewById(R.id.ckChoose);
+            imgAlbum = view.findViewById(R.id.imgAlbum);
         }
     }
 
@@ -60,21 +65,11 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     }
 
 
+   // private  ViewHolder[] tempHolder = new ViewHolder[2];
     //此方法是资源文件musicList里有有多少就执行多少次？？？
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.music_item, parent, false);
-
-//        Music music = mMusicList.get(i++);
-//        TextView txtMusicName = view.findViewById(R.id.music_name);
-//        ImageView imgAlbum = view.findViewById(R.id.imgAlbum);
-//        Bitmap bitmap = Functivity.getCover(music.getPic());
-//        if(bitmap == null){
-//            imgAlbum.setImageResource(R.drawable.picture_default);
-//        }else{
-//            imgAlbum.setImageBitmap(bitmap);
-//        }
-//        txtMusicName.setText(music.getTitle());
 
         final ViewHolder holder = new ViewHolder(view);
         //此纵向布局文件包括文本框控件和多选框控件
@@ -83,6 +78,17 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
                 if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
                     int position = holder.getAdapterPosition();
+
+//                    tempHolder[0] = tempHolder[1];
+//                    tempHolder[1] = holder;
+//                    //PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
+//                    if(tempHolder[0] != null){
+//                        tempHolder[0].txtMusicName.setTextColor(Color.parseColor("#545454"));
+//                        tempHolder[0].txtMusicArtist.setTextColor(Color.parseColor("#545454"));
+//                    }
+//                    tempHolder[1].txtMusicName.setTextColor(Color.parseColor("#0000FF"));
+//                    tempHolder[1].txtMusicArtist.setTextColor(Color.parseColor("#0000FF"));
+
                     Context context = v.getContext();
                     Intent intent = new Intent();
                     intent.putExtra("extra_position", String.valueOf(position));
@@ -130,6 +136,11 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         Music music = mMusicList.get(position);
 
         holder.txtMusicName.setText(music.getTitle());
+        holder.txtMusicArtist.setText(music.getArtist());
+
+        //异步加载图片
+        LoadPicture task = new LoadPicture(holder.imgAlbum);
+        task.execute(music);
 
         if (mMusicList.get(position).isSelect()) {
             holder.ckChoose.setChecked(true);
@@ -147,6 +158,31 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
     }
 
+    class LoadPicture extends AsyncTask<Music,Void,Bitmap>{
+        private ImageView mImageView;
+        private Music mMusic;
+
+        public LoadPicture(ImageView imageView){
+            mImageView = imageView;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Music... music) {
+            mMusic = music[0];
+            Bitmap bitmap = Functivity.getCover(mMusic.getPic());
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if(bitmap == null){
+                mImageView.setImageResource(R.drawable.picture_default);
+            }else{
+                mImageView.setImageBitmap(bitmap);
+            }
+        }
+    }
     //此处重写的函数返回值决定RecycleView中有多少行
     public int getItemCount() {
         return mMusicList.size();

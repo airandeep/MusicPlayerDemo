@@ -1,12 +1,10 @@
 package com.example.a11084919.musicplayerdemo.play;
 
 
-import android.content.Context;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+import com.example.a11084919.musicplayerdemo.model.Music;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,8 +75,7 @@ public class Player implements IPlay {
             this.position = position;
             return true;
         }else{
-            Music music = PublicObject.musicList.get(position);
-            setCurrentMusic(music);
+            setCurrentMusic(PublicObject.musicList.get(position));
 
             this.position = position;
             try {
@@ -89,7 +86,6 @@ public class Player implements IPlay {
                 mediaPlayer.start();
                 notifyPlayStatusChanged();
             } catch (IOException e) {
-                // Log.e(TAG, "play: ", e);
                 notifyPlayStatusChanged();
                 return false;
             }
@@ -153,13 +149,14 @@ public class Player implements IPlay {
     public boolean playLast(){
         int flag = getPlayMode();
         if(flag == Player.LISTLOOP){
+
             //解决删除问题
             if(position == 0 ||position == -1 || position >= PublicObject.musicList.size()){
                 position = PublicObject.musicList.size();
             }
             position--;
-            Music music = PublicObject.musicList.get(position);
-            setCurrentMusic(music);
+
+            setCurrentMusic(PublicObject.musicList.get(position));
             try {
                 //切歌时必须先stop；
                 mediaPlayer.stop();
@@ -175,22 +172,25 @@ public class Player implements IPlay {
         }else if(flag == Player.SINGLELOOP){
             playCurrentSong();
         }else if(flag == Player.RANDLOOP){
+
             int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
             play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
+
         }
         return false;
     }
 
     public boolean playNext(){
         int flag = getPlayMode();
+
         if(flag == Player.LISTLOOP){
             //解决删除问题
             if(position >= PublicObject.musicList.size()-1){
                 position = -1;
             }
             position++;
-            Music music = PublicObject.musicList.get(position);
-            setCurrentMusic(music);
+
+            setCurrentMusic(PublicObject.musicList.get(position));
 
             try {
                 mediaPlayer.stop();

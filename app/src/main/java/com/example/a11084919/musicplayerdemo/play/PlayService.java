@@ -9,22 +9,23 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+import com.example.a11084919.musicplayerdemo.model.Music;
 
+import static android.app.Notification.VISIBILITY_PUBLIC;
 import static java.lang.Thread.sleep;
 
 
@@ -64,7 +65,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                     if(mPlayer.isPlaying()){
                         mPlayer.updateProgressBar();
                     }
-
                     break;
                 default:
                     break;
@@ -72,12 +72,12 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         }
     };
 
-    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            handleCommandIntent(intent);
-        }
-    };
+//    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            handleCommandIntent(intent);
+//        }
+//    };
 
     public void onCreate() {
         super.onCreate();
@@ -85,12 +85,12 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         mPlayer = Player.getInstance();
         mPlayer.registerCallback(this);//将本服务存到mPlay实例化对象中容器mCallbacks
 
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_PLAY_TOGGLE);
-        filter.addAction(ACTION_PLAY_LAST);
-        filter.addAction(ACTION_PLAY_NEXT);
-        filter.addAction(ACTION_STOP_SERVICE);
-        registerReceiver(mIntentReceiver,filter);
+//        final IntentFilter filter = new IntentFilter();
+//        filter.addAction(ACTION_PLAY_TOGGLE);
+//        filter.addAction(ACTION_PLAY_LAST);
+//        filter.addAction(ACTION_PLAY_NEXT);
+//        filter.addAction(ACTION_STOP_SERVICE);
+//        registerReceiver(mIntentReceiver,filter);
 
 
         cycleFlag = true;
@@ -109,52 +109,72 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         }).start();
     }
 
-    private void handleCommandIntent(Intent intent){
-        final String command = intent.getAction();
-        switch (command){
-            case ACTION_PLAY_TOGGLE:{
-                if(mPlayer.isPlaying()){
-                    pause();
-                }else{
-                    rePlay();
-                }
-                break;
-            }
-            case ACTION_PLAY_LAST:{
-                playLast();
-                break;
-            }
-            case ACTION_PLAY_NEXT:{
-                playNext();
-                break;
-            }
-            case ACTION_STOP_SERVICE:{
-                if(isPlaying()){
-                    pause();
-                }
-                manager.cancel(1000);
-                break;
-            }
-            default:{
-                break;
-            }
-        }
-    }
+//    private void handleCommandIntent(Intent intent){
+//        final String command = intent.getAction();
+//        switch (command){
+//            case ACTION_PLAY_TOGGLE:{
+//                if(mPlayer.isPlaying()){
+//                    pause();
+//                }else{
+//                    rePlay();
+//                }
+//                break;
+//            }
+//            case ACTION_PLAY_LAST:{
+//                playLast();
+//                break;
+//            }
+//            case ACTION_PLAY_NEXT:{
+//                playNext();
+//                break;
+//            }
+//            case ACTION_STOP_SERVICE:{
+//                if(isPlaying()){
+//                    pause();
+//                }
+//                manager.cancel(1000);
+//                break;
+//            }
+//            default:{
+//                break;
+//            }
+//        }
+//    }
 
     public int onStartCommand(Intent intent,int flags,int startId){
         if (intent != null) {
-            String action = intent.getAction();
-            if (ACTION_PLAY_TOGGLE.equals(action)) {
-                if(mPlayer.isPlaying()){
-                    pause();
-                }else{
-                    rePlay();
+            final String command = intent.getAction();
+            if(command != null){
+                switch (command){
+                    case ACTION_PLAY_TOGGLE:{
+                        if(mPlayer.isPlaying()){
+                            pause();
+                        }else{
+                            rePlay();
+                        }
+                        break;
+                    }
+                    case ACTION_PLAY_LAST:{
+                        playLast();
+                        break;
+                    }
+                    case ACTION_PLAY_NEXT:{
+                        playNext();
+                        break;
+                    }
+                    case ACTION_STOP_SERVICE:{
+                        if(isPlaying()){
+                            pause();
+                        }
+                        manager.cancel(1000);
+                        break;
+                    }
+                    default:{
+                        break;
+                    }
                 }
-            } else if (ACTION_PLAY_NEXT.equals(action)) {
-                playNext();
-            } else if (ACTION_PLAY_LAST.equals(action)) {
-                playLast();
             }
+
         }
         return START_STICKY;
     }
@@ -275,12 +295,12 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     //创建通知，使本服务为前台服务，从而不至于被系统回收
     private void showNotification() {
 
-
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, PlayerActivity.class), 0);
         Notification notification = new NotificationCompat.Builder(this,"music")
                 .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked//当点击通知跳到那首歌曲
+                .setCustomBigContentView(getContentView())
                 .setCustomContentView(getSmallContentView())
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
@@ -290,26 +310,40 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     }
 
 
+    private RemoteViews getTestContentView(){
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.remote_view_test);
+        return remoteViews;
+    }
 
     //通知栏绑定UI
-    private RemoteViews getSmallContentView() {
+    private RemoteViews getContentView() {
         RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player);
-        setUpRemoteView(mContentViewSmall);
+        setUpRemoteView(mContentViewSmall,1);
+        updateRemoteViews(mContentViewSmall);
+        return mContentViewSmall;
+    }
+
+    private RemoteViews getSmallContentView(){
+        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_small);
+        setUpRemoteView(mContentViewSmall,2);
         updateRemoteViews(mContentViewSmall);
         return mContentViewSmall;
     }
 
 
 
-    private void setUpRemoteView(RemoteViews remoteView) {
-        remoteView.setImageViewResource(R.id.image_view_close, R.drawable.ic_remote_view_close);
+    private void setUpRemoteView(RemoteViews remoteView,int flag) {
+        if(flag == 1){
+            remoteView.setImageViewResource(R.id.image_view_close, R.drawable.ic_remote_view_close);
+            remoteView.setOnClickPendingIntent(R.id.button_close, getPendingIntentService(ACTION_STOP_SERVICE));
+        }
+
+
         remoteView.setImageViewResource(R.id.image_view_play_last, R.drawable.ic_remote_view_play_last);
         remoteView.setImageViewResource(R.id.image_view_play_next, R.drawable.ic_remote_view_play_next);
-
-        remoteView.setOnClickPendingIntent(R.id.button_close, getPendingIntentBroadcast(ACTION_STOP_SERVICE));
-        remoteView.setOnClickPendingIntent(R.id.button_play_last, getPendingIntentBroadcast(ACTION_PLAY_LAST));
-        remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntentBroadcast(ACTION_PLAY_NEXT));
-        remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntentBroadcast(ACTION_PLAY_TOGGLE));
+        remoteView.setOnClickPendingIntent(R.id.button_play_last, getPendingIntentService(ACTION_PLAY_LAST));
+        remoteView.setOnClickPendingIntent(R.id.button_play_next, getPendingIntentService(ACTION_PLAY_NEXT));
+        remoteView.setOnClickPendingIntent(R.id.button_play_toggle, getPendingIntentService(ACTION_PLAY_TOGGLE));
 
     }
 
@@ -326,9 +360,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         remoteView.setTextViewText(R.id.text_view_name, mPlayer.getCurrentMusic().getTitle());
         remoteView.setTextViewText(R.id.text_view_artist, mPlayer.getCurrentMusic().getArtist());
 
-//        int position = mPlayer.getProgress();
-//        int time = mPlayer.getDuration();
-//        remoteView.setProgressBar(R.id.PBMusicInfo,200,200*position/time,false);
     }
 
 

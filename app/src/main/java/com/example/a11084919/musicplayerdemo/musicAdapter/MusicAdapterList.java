@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -15,8 +14,11 @@ import android.widget.TextView;
 
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.model.Music;
 
 import java.util.List;
+
+
 
 public class MusicAdapterList extends ArrayAdapter<Music>{
     private int resourceId;//listView 自定义 xml
@@ -27,6 +29,7 @@ public class MusicAdapterList extends ArrayAdapter<Music>{
         super(context,textViewResourceId,objects);
         resourceId = textViewResourceId;
     }
+
 
     public View getView(int position, View convertView, ViewGroup parent){
         Music music = getItem(position);

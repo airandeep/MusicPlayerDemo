@@ -6,7 +6,7 @@
     <version value="1" />
 
     <list>
-        <mapping class="com.example.a11084919.musicplayerdemo.musicAdapter.Music" />
+        <mapping class="com.example.a11084919.musicplayerdemo.model.Music" />
     </list>
 
 </litepal>

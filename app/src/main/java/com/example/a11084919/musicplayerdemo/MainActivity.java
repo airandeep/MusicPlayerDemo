@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+import com.example.a11084919.musicplayerdemo.model.Music;
 
 import org.litepal.crud.DataSupport;
 
@@ -84,19 +84,39 @@ public class MainActivity extends BaseActivity {
         }
         Intent intentJus = getIntent();
         String flag = intentJus.getStringExtra("extra_flag");
-        tempMusicList = new ArrayList<>();
+
         if(flag == null){
-            tempMusicList = DataSupport.findAll(Music.class);
-            if(tempMusicList.size() > 0){
-                PublicObject.musicList = tempMusicList;
+//            tempMusicList = DataSupport.findAll(Music.class);
+//            if(tempMusicList.size() > 0){
+//                if(!(PublicObject.musicList.size()>0)){
+//                    PublicObject.musicList = tempMusicList;
+//                }
+//                Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+//                startActivity(intent);
+//                finish();
+//                return;
+//            }
+
+            if(PublicObject.musicList != null){
                 Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
                 startActivity(intent);
                 finish();
                 return;
+            }else{
+                tempMusicList = DataSupport.findAll(Music.class);
+                if(tempMusicList.size()>0){
+                    PublicObject.musicList = tempMusicList;
+                    Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
             }
+
+
         }
 
-
+        tempMusicList = new ArrayList<>();
 
 
 
@@ -139,7 +159,7 @@ public class MainActivity extends BaseActivity {
 //                                getFileMusic(files);
 
                                 getMusicFileByMediaStore();
-                                if(PublicObject.musicList.size() > 0){
+                                if(PublicObject.musicList != null){
                                     PublicObject.musicList.clear();
                                 }
                                 PublicObject.musicList = tempMusicList;
@@ -281,7 +301,7 @@ public class MainActivity extends BaseActivity {
 //                            getFileMusic(files);
 
                             getMusicFileByMediaStore();
-                            if(PublicObject.musicList.size() > 0){
+                            if(PublicObject.musicList != null){
                                 PublicObject.musicList.clear();
                             }
                             PublicObject.musicList = tempMusicList;

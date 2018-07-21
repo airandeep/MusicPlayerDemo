@@ -1,4 +1,4 @@
-package com.example.a11084919.musicplayerdemo.musicAdapter;
+package com.example.a11084919.musicplayerdemo.model;
 
 
 import org.litepal.crud.DataSupport;
@@ -13,8 +13,6 @@ public class Music extends DataSupport{
     private String path;
     //演唱者和歌曲名//临时使用
     private String name;
-
-
     //演唱者
     private String artist;
     //歌曲名
@@ -24,6 +22,7 @@ public class Music extends DataSupport{
     //歌曲图片
     private byte[] pic;
 
+    //private boolean isPlaying;
 
 //    public Music(String name,String path){
 //        this.name = name;
@@ -32,6 +31,7 @@ public class Music extends DataSupport{
     public boolean isSelect() {
         return isSelect;
     }
+
     public void setSelect(boolean isSelect) {
         this.isSelect = isSelect;
     }
@@ -39,11 +39,13 @@ public class Music extends DataSupport{
     public String getPath() {
         return path;
     }
+
     public void setPath(String path) {
         this.path = path;
     }
 
     public String getName() { return name; }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -79,4 +81,12 @@ public class Music extends DataSupport{
     public void setPic(byte[] pic) {
         this.pic = pic;
     }
+//
+//    public boolean isPlaying() {
+//        return isPlaying;
+//    }
+//
+//    public void setPlaying(boolean playing) {
+//        isPlaying = playing;
+//    }
 }

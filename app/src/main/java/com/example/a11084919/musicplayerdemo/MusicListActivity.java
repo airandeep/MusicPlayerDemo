@@ -1,23 +1,22 @@
 package com.example.a11084919.musicplayerdemo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.musicAdapter.Music;
+import com.example.a11084919.musicplayerdemo.model.Music;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterList;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
 
@@ -176,13 +175,17 @@ public class MusicListActivity extends BaseActivity {
                 Intent intent = new Intent(MusicListActivity.this,MainActivity.class);
                 intent.putExtra("extra_flag", "true");
                 startActivity(intent);
-                finish();
+                //finish();
             }
         });
     }
 
+
+
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        AudioManager audioManager  = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:
                 if(stateNow == STATE_MANAGE){
@@ -193,9 +196,14 @@ public class MusicListActivity extends BaseActivity {
                 }else{
                     ActivityCollector.finishAll();
                 }
-
                 break;
-                default:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,AudioManager.FX_FOCUS_NAVIGATION_UP);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,AudioManager.FX_FOCUS_NAVIGATION_UP);
+
+            default:
                     break;
         }
         return true;
