@@ -162,6 +162,9 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
                     mPlayer.setPlayMode(Player.RANDLOOP);
                     btnPlayWay.setText("随机循环");
                 }else if(flag.equals("随机循环")){
+                    mPlayer.setPlayMode(Player.QUICKRANDLOOP);
+                    btnPlayWay.setText("快速随机");
+                }else if(flag.equals("快速随机")){
                     mPlayer.setPlayMode(Player.LISTLOOP);
                     btnPlayWay.setText("列表循环");
                 }
@@ -203,6 +206,8 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
             btnPlayWay.setText("单曲循环");
         }else if(flag == Player.RANDLOOP){
             btnPlayWay.setText("随机循环");
+        }else if(flag == Player.QUICKRANDLOOP){
+            btnPlayWay.setText("快速随机");
         }else{
             btnPlayWay.setText("列表循环");
         }

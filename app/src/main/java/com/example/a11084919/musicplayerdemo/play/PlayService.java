@@ -32,6 +32,7 @@ import static java.lang.Thread.sleep;
 //最终通过在活动
 public class PlayService extends Service implements IPlay,IPlay.Callback{
 
+
     private static final String ACTION_PLAY_TOGGLE = "airan.music.ACTION.PLAY_TOGGLE";
     private static final String ACTION_PLAY_LAST = "airan.music.ACTION.PLAY_LAST";
     private static final String ACTION_PLAY_NEXT = "airan.music.ACTION.PLAY_NEXT";
@@ -166,6 +167,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                         if(isPlaying()){
                             pause();
                         }
+                        stopForeground(true);
                         manager.cancel(1000);
                         break;
                     }
@@ -182,6 +184,9 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     @Override
     public void onDestroy() {
         super.onDestroy();
+        release();
+        stopForeground(true);
+        manager.cancel(1000);
     }
 
     //活动就是通过与服务绑定然后利用此方法进行交互返回BInder内部类的实例然后交互
@@ -193,6 +198,10 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
     public boolean play(int position,String musicPath,boolean notiFlag){
         return mPlayer.play(position,musicPath,notiFlag);
+    }
+
+    public void release(){
+        mPlayer.release();
     }
 
     public boolean playCurrentSong(){
@@ -275,13 +284,19 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     public void onUpdateProgressBar(){
         int position = mPlayer.getProgress();
         int time = mPlayer.getDuration();
+        int flag = mPlayer.getPlayMode();
+        if(flag == Player.QUICKRANDLOOP){
+            time = time / 6;
+        }
         if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
-            int flag = mPlayer.getPlayMode();
             if(flag == Player.LISTLOOP){
                 mPlayer.playNext();
             }else if(flag == Player.SINGLELOOP){
                 mPlayer.playCurrentSong();
             }else if(flag == Player.RANDLOOP){
+                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
+                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
+            }else if(flag == Player.QUICKRANDLOOP){
                 int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
                 play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
             }else{
@@ -306,7 +321,13 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                 .setOngoing(true)
                 .build();
         notification.flags = Notification.FLAG_ONGOING_EVENT;
-        manager.notify(1000,notification);
+
+
+        if(isPlaying()){
+            startForeground(1000,notification);
+        }else{
+            manager.notify(1000,notification);
+        }
     }
 
 

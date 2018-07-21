@@ -6,6 +6,8 @@ import com.example.a11084919.musicplayerdemo.model.Music;
 public interface IPlay {
     boolean play(int position,String musicPath,boolean notiFlag);
 
+    void release();
+
     boolean playCurrentSong();
     //获取当前歌曲在歌曲列表中位置
     int getPosition();

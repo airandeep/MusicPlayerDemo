@@ -3,16 +3,22 @@ package com.example.a11084919.musicplayerdemo;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
@@ -21,6 +27,8 @@ import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterList;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
 
 import org.litepal.crud.DataSupport;
+
+import java.util.List;
 
 public class MusicListActivity extends BaseActivity {
 
@@ -39,13 +47,22 @@ public class MusicListActivity extends BaseActivity {
     public static final int STATE_MANAGE = 1;
     public static int stateNow;
 
+    private List<Music> tempMusicList;
 
+    private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
 
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
 
         RecyclerView recyclerView = findViewById(R.id.musicRecycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -55,6 +72,7 @@ public class MusicListActivity extends BaseActivity {
         musicAdapterRecycle = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
         recyclerView.setAdapter(musicAdapterRecycle);
 
+
 //        musicAdapterList = new MusicAdapterList(MusicListActivity.this,R.layout.music_item,PublicObject.musicList);
 //        ListView listView = findViewById(R.id.musicListView);
 //        listView.setAdapter(musicAdapterList);
@@ -63,17 +81,20 @@ public class MusicListActivity extends BaseActivity {
         LinOutButton = findViewById(R.id.LinOutButton);
         btnChooseAll = findViewById(R.id.btnChooseAll);
         btnDelete = findViewById(R.id.btnDelete);
-        btnBack = findViewById(R.id.back_button);
-        btnHome = findViewById(R.id.home_button);
+        //btnBack = findViewById(R.id.back_button);
+       // btnHome = findViewById(R.id.home_button);
 
-        int n = PublicObject.musicList.size(),count = 0;
-        for(int i = 0;i<n;i++){
-            if(PublicObject.musicList.get(i).isSelect()){
-                count++;
+        if(PublicObject.musicList != null){
+            int n = PublicObject.musicList.size(),count = 0;
+            for(int i = 0;i<n;i++){
+                if(PublicObject.musicList.get(i).isSelect()){
+                    count++;
+                }
             }
-        }
-        if(count == n){
-            btnChooseAll.setText("全不选");
+            if(count == n){
+                btnChooseAll.setText("全不选");
+            }
+
         }
 
 
@@ -161,27 +182,43 @@ public class MusicListActivity extends BaseActivity {
             }
         });
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onKeyDown(KeyEvent.KEYCODE_BACK,null );
-            }
-        });
 
-
-        btnHome.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MusicListActivity.this,MainActivity.class);
-                intent.putExtra("extra_flag", "true");
-                startActivity(intent);
-                //finish();
-            }
-        });
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar,menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+            }
+            case R.id.homeScanning:{
+                Intent intent = new Intent(MusicListActivity.this,MainActivity.class);
+                intent.putExtra("extra_flag", "true");
+                startActivity(intent);
+                break;
+            }
+            case R.id.delete:{
+
+                break;
+            }
+            case R.id.settings:{
+
+                break;
+            }
+            default:{
+                break;
+            }
+        }
+        return true;
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

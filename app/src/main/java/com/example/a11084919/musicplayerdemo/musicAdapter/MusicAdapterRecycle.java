@@ -45,7 +45,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         TextView txtMusicArtist;
         CheckBox ckChoose;
         FrameLayout btnMusicDelete;
-        ImageView imgAlbum;
+        //ImageView imgAlbum;
 
         public ViewHolder(View view) {
             super(view);
@@ -54,7 +54,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
             txtMusicArtist = view.findViewById(R.id.music_artist);
             btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
             ckChoose = view.findViewById(R.id.ckChoose);
-            imgAlbum = view.findViewById(R.id.imgAlbum);
+           // imgAlbum = view.findViewById(R.id.imgAlbum);
         }
     }
 
@@ -138,9 +138,9 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         holder.txtMusicName.setText(music.getTitle());
         holder.txtMusicArtist.setText(music.getArtist());
 
-        //异步加载图片
-        LoadPicture task = new LoadPicture(holder.imgAlbum);
-        task.execute(music);
+//        //异步加载图片
+//        LoadPicture task = new LoadPicture(holder.imgAlbum);
+//        task.execute(music);
 
         if (mMusicList.get(position).isSelect()) {
             holder.ckChoose.setChecked(true);
@@ -158,31 +158,31 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
     }
 
-    class LoadPicture extends AsyncTask<Music,Void,Bitmap>{
-        private ImageView mImageView;
-        private Music mMusic;
-
-        public LoadPicture(ImageView imageView){
-            mImageView = imageView;
-        }
-
-        @Override
-        protected Bitmap doInBackground(Music... music) {
-            mMusic = music[0];
-            Bitmap bitmap = Functivity.getCover(mMusic.getPic());
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if(bitmap == null){
-                mImageView.setImageResource(R.drawable.picture_default);
-            }else{
-                mImageView.setImageBitmap(bitmap);
-            }
-        }
-    }
+//    class LoadPicture extends AsyncTask<Music,Void,Bitmap>{
+//        private ImageView mImageView;
+//        private Music mMusic;
+//
+//        public LoadPicture(ImageView imageView){
+//            mImageView = imageView;
+//        }
+//
+//        @Override
+//        protected Bitmap doInBackground(Music... music) {
+//            mMusic = music[0];
+//            Bitmap bitmap = Functivity.getCover(mMusic.getPic());
+//            return bitmap;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Bitmap bitmap) {
+//            super.onPostExecute(bitmap);
+//            if(bitmap == null){
+//                mImageView.setImageResource(R.drawable.picture_default);
+//            }else{
+//                mImageView.setImageBitmap(bitmap);
+//            }
+//        }
+//    }
     //此处重写的函数返回值决定RecycleView中有多少行
     public int getItemCount() {
         return mMusicList.size();

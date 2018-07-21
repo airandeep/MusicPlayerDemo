@@ -15,6 +15,7 @@ public class Player implements IPlay {
     public static final int LISTLOOP = 0;
     public static final int SINGLELOOP = 1;
     public static final int RANDLOOP = 2;
+    public static final int QUICKRANDLOOP = 3;
 
     private static volatile Player sInstance;
     private MediaPlayer mediaPlayer;
@@ -92,6 +93,12 @@ public class Player implements IPlay {
             return true;
         }
 
+    }
+
+    public void release(){
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+        }
     }
 
     public boolean playCurrentSong(){
