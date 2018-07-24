@@ -1,8 +1,7 @@
-package com.example.a11084919.musicplayerdemo.controlsOv;
+package com.example.a11084919.musicplayerdemo.controlsOverride;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,12 +10,10 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.animation.LinearInterpolator;
-import android.widget.ImageView;
 
 public class ShadowImageView extends AppCompatImageView {
     private static final int KEY_SHADOW_COLOR = 0x1E000000;

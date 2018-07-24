@@ -1,8 +1,11 @@
 package com.example.a11084919.musicplayerdemo;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +31,7 @@ import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterList;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
+import com.example.a11084919.musicplayerdemo.play.PlayService;
 
 import org.litepal.crud.DataSupport;
 
@@ -42,14 +47,30 @@ public class MusicListActivity extends BaseActivity {
     private LinearLayout LinOutButton;
     private Button btnChooseAll;
     private Button btnDelete;
+    private RecyclerView recyclerView;
+
+    private ImageView imgNext;
 
     public static final int STATE_PLAY_ENABLE = 0;
     public static final int STATE_MANAGE = 1;
     public static int stateNow;
 
-
-
     private DrawerLayout drawerLayout;
+
+
+    private PlayService playService;
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,14 +86,14 @@ public class MusicListActivity extends BaseActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
         //将nav_call设置为默认选中
-        navigationView.setCheckedItem(R.id.nav_call);
+        navigationView.setCheckedItem(R.id.nav_play_list);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 drawerLayout.closeDrawers();
                 switch(item.getItemId()){
-                    case R.id.nav_call:{
-                        Toast.makeText(MusicListActivity.this,"你单击了电话",Toast.LENGTH_SHORT).show();
+                    case R.id.nav_play_list:{
+                        Toast.makeText(MusicListActivity.this,"播放列表",Toast.LENGTH_SHORT).show();
                         break;
                     }
                     default:{
@@ -87,12 +108,12 @@ public class MusicListActivity extends BaseActivity {
 
 
 
-        RecyclerView recyclerView = findViewById(R.id.musicRecycleView);
+        recyclerView = findViewById(R.id.musicRecycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
-        musicAdapterRecycle = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
+        musicAdapterRecycle = new MusicAdapterRecycle(connection,MusicListActivity.this, PublicObject.musicList);
         recyclerView.setAdapter(musicAdapterRecycle);
 
 
@@ -104,7 +125,7 @@ public class MusicListActivity extends BaseActivity {
         LinOutButton = findViewById(R.id.LinOutButton);
         btnChooseAll = findViewById(R.id.btnChooseAll);
         btnDelete = findViewById(R.id.btnDelete);
-
+        imgNext = findViewById(R.id.nav_btn_next);
 
         if(PublicObject.musicList != null){
             int n = PublicObject.musicList.size(),count = 0;
@@ -204,10 +225,25 @@ public class MusicListActivity extends BaseActivity {
             }
         });
 
+        imgNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(),"下一首歌曲",Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 
+//    protected void onPause(){
+//        recyclerView.setAdapter(musicAdapterRecycle);
+//        super.onPause();
+//    }
 
+//    protected void onRestart(){
+//        super.onRestart();
+//
+//    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar,menu);

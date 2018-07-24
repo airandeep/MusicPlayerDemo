@@ -24,7 +24,7 @@
                 android:background="@drawable/ic_back"/>
         </FrameLayout>
 
-        <com.example.a11084919.musicplayerdemo.controlsOv.MarqueeTextView
+        <com.example.a11084919.musicplayerdemo.controlsOverride.MarqueeTextView
             android:id="@+id/txtMusicName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
             android:layout_weight="1">
         </FrameLayout>
     </LinearLayout>
-    <com.example.a11084919.musicplayerdemo.controlsOv.MarqueeTextView
+    <com.example.a11084919.musicplayerdemo.controlsOverride.MarqueeTextView
         android:id="@+id/txtMusic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

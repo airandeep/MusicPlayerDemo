@@ -37,16 +37,28 @@
             android:orientation="vertical"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp">
-
-            <TextView
-                android:id="@+id/music_name"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"
-                android:singleLine="true"
-                android:text="菊花台"
-                android:textSize="26dp"/>
+                android:gravity="center">
+                <ImageView
+                    android:id="@+id/imgPlaying"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/playing"
+                    android:visibility="gone"/>
+                <TextView
+                    android:id="@+id/music_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="菊花台"
+                    android:textSize="26dp"
+                    android:textColor="#545454"/>
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/music_artist"
                 android:layout_width="wrap_content"

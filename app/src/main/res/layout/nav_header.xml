@@ -11,19 +11,20 @@
         android:src="@drawable/picture_default"
         android:layout_centerInParent="true"/>
     <TextView
-        android:id="@+id/mail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="airan@qq.com"
-        android:textColor="#FFF"
-        android:textSize="14sp"/>
-    <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/mail"
-        android:text="airanGod"
+        android:text="菊花台"
+        android:textColor="#FFF"
+        android:textSize="18sp"/>
+    <TextView
+        android:id="@+id/mail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="周杰伦"
         android:textColor="#FFF"
         android:textSize="14sp"/>
+
 </RelativeLayout>

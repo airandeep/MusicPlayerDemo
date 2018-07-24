@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_call"
+            android:id="@+id/nav_play_list"
             android:icon="@drawable/nav_call"
-            android:title="Call" />
+            android:title="播放列表" />
         <item
-            android:id="@+id/nav_friends"
+            android:id="@+id/nav_play_history"
             android:icon="@drawable/nav_friends"
-            android:title="Friends" />
+            android:title="播放历史" />
         <item
-            android:id="@+id/nav_location"
+            android:id="@+id/nav_music_like"
             android:icon="@drawable/nav_location"
-            android:title="Location" />
+            android:title="喜爱歌曲" />
         <item
-            android:id="@+id/nav_mail"
+            android:id="@+id/nav_album_list"
             android:icon="@drawable/nav_mail"
-            android:title="Mail" />
+            android:title="专辑列表" />
         <item
-            android:id="@+id/nav_task"
+            android:id="@+id/nav_more_item"
             android:icon="@drawable/nav_task"
-            android:title="Tasks" />
+            android:title=">>>>>>>" />
     </group>
 </menu>

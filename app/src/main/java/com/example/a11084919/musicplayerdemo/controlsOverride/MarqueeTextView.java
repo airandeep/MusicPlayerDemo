@@ -1,4 +1,4 @@
-package com.example.a11084919.musicplayerdemo.controlsOv;
+package com.example.a11084919.musicplayerdemo.controlsOverride;
 
 import android.content.Context;
 import android.support.v7.widget.AppCompatTextView;

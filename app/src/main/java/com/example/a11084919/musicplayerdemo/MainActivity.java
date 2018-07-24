@@ -127,8 +127,7 @@ public class MainActivity extends BaseActivity {
                 //再次点击此控件时，静态成员变量musicList中已经存在元素直接跳到播放列表界面
                 if(btnTxt.equals("进入播放列表")){
                     Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
-                    //必须关闭掉播放列表活动，然后重新创建，因为数据已经刷新了//由于List已经更新，不能在用之前的适配器了
-                    //finish();
+                    //必须关闭掉播放列表活动，然后重新创建，因为数据已经刷新了//由于集合List已经更新，不能在用之前的适配器了
                     ActivityCollector.finishAll();
                     startActivity(intent);
                 }else{

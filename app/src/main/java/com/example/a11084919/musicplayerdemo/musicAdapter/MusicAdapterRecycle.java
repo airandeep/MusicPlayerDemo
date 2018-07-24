@@ -2,7 +2,9 @@ package com.example.a11084919.musicplayerdemo.musicAdapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -23,7 +25,9 @@ import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
+import com.example.a11084919.musicplayerdemo.play.PlayService;
 
 import org.litepal.crud.DataSupport;
 
@@ -36,6 +40,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     int mEditMode = 0;
     private static String TAG = "MusicAdapterRecycle";
     private Context mContext;
+    private ServiceConnection mServiceConnection;
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -45,6 +50,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         TextView txtMusicArtist;
         CheckBox ckChoose;
         FrameLayout btnMusicDelete;
+        ImageView imgPlaying;
         //ImageView imgAlbum;
 
         public ViewHolder(View view) {
@@ -54,18 +60,20 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
             txtMusicArtist = view.findViewById(R.id.music_artist);
             btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
             ckChoose = view.findViewById(R.id.ckChoose);
+            imgPlaying = view.findViewById(R.id.imgPlaying);
            // imgAlbum = view.findViewById(R.id.imgAlbum);
         }
     }
 
     //像适配器中传入数据集合
-    public MusicAdapterRecycle(Context context,List<Music> musicList) {
+    public MusicAdapterRecycle(final ServiceConnection serviceConnection,Context context, List<Music> musicList) {
+        mServiceConnection = serviceConnection;
         mMusicList = musicList;
         mContext = context;
     }
 
 
-   // private  ViewHolder[] tempHolder = new ViewHolder[2];
+    private  ViewHolder[] tempHolder = new ViewHolder[2];
     //此方法是资源文件musicList里有有多少就执行多少次？？？
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -79,15 +87,21 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                 if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
                     int position = holder.getAdapterPosition();
 
-//                    tempHolder[0] = tempHolder[1];
-//                    tempHolder[1] = holder;
-//                    //PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
-//                    if(tempHolder[0] != null){
-//                        tempHolder[0].txtMusicName.setTextColor(Color.parseColor("#545454"));
-//                        tempHolder[0].txtMusicArtist.setTextColor(Color.parseColor("#545454"));
-//                    }
-//                    tempHolder[1].txtMusicName.setTextColor(Color.parseColor("#0000FF"));
-//                    tempHolder[1].txtMusicArtist.setTextColor(Color.parseColor("#0000FF"));
+                    tempHolder[0] = tempHolder[1];
+                    tempHolder[1] = holder;
+                    if(tempHolder[0] != null){
+                        //tempHolder[0].txtMusicName.setTextColor(Color.parseColor("#545454"));
+                        tempHolder[0].imgPlaying.setVisibility(View.GONE);
+                    }
+                    //tempHolder[1].txtMusicName.setTextColor(Color.parseColor("#0000FF"));
+                    tempHolder[1].imgPlaying.setVisibility(View.VISIBLE);
+
+
+
+//                    Intent binIntent = new Intent(mContext, PlayService.class);
+//                    mContext.startService(binIntent);
+//                    mContext.bindService(binIntent,mServiceConnection,Context.BIND_AUTO_CREATE);
+
 
                     Context context = v.getContext();
                     Intent intent = new Intent();
@@ -141,6 +155,18 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 //        //异步加载图片
 //        LoadPicture task = new LoadPicture(holder.imgAlbum);
 //        task.execute(music);
+
+        if(PublicObject.indexFlag){
+//            if(position == PublicObject.musicIndexs[0]){
+//                holder.txtMusicName.setTextColor(Color.parseColor("#545454"));
+            if(position == PublicObject.musicIndexs[1]){
+                //holder.txtMusicName.setTextColor(Color.parseColor("#0000FF"));
+                holder.imgPlaying.setVisibility(View.VISIBLE);
+            }else{
+                //holder.txtMusicName.setTextColor(Color.parseColor("#545454"));
+                holder.imgPlaying.setVisibility(View.GONE);
+            }
+        }
 
         if (mMusicList.get(position).isSelect()) {
             holder.ckChoose.setChecked(true);

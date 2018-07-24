@@ -77,8 +77,11 @@ public class Player implements IPlay {
             return true;
         }else{
             setCurrentMusic(PublicObject.musicList.get(position));
-
             this.position = position;
+
+            PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
+            PublicObject.musicIndexs[1] = position;
+
             try {
                 mediaPlayer.stop();
                 mediaPlayer.reset();
@@ -164,6 +167,8 @@ public class Player implements IPlay {
             position--;
 
             setCurrentMusic(PublicObject.musicList.get(position));
+            PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
+            PublicObject.musicIndexs[1] = position;
             try {
                 //切歌时必须先stop；
                 mediaPlayer.stop();
@@ -178,7 +183,7 @@ public class Player implements IPlay {
             return true;
         }else if(flag == Player.SINGLELOOP){
             playCurrentSong();
-        }else if(flag == Player.RANDLOOP){
+        }else if(flag == Player.RANDLOOP || flag == Player.QUICKRANDLOOP){
 
             int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
             play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
@@ -198,7 +203,8 @@ public class Player implements IPlay {
             position++;
 
             setCurrentMusic(PublicObject.musicList.get(position));
-
+            PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
+            PublicObject.musicIndexs[1] = position;
             try {
                 mediaPlayer.stop();
                 mediaPlayer.reset();
@@ -212,7 +218,7 @@ public class Player implements IPlay {
             return true;
         }else if(flag == Player.SINGLELOOP){
             playCurrentSong();
-        }else if(flag == Player.RANDLOOP){
+        }else if(flag == Player.RANDLOOP || flag == Player.QUICKRANDLOOP){
             int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
             play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
         }

@@ -63,9 +63,9 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         public void handleMessage(Message msg){
             switch (msg.what){
                 case 0:
-                    if(mPlayer.isPlaying()){
+                    //if(mPlayer.isPlaying()){
                         mPlayer.updateProgressBar();
-                    }
+//                    }
                     break;
                 default:
                     break;
@@ -86,13 +86,14 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         mPlayer = Player.getInstance();
         mPlayer.registerCallback(this);//将本服务存到mPlay实例化对象中容器mCallbacks
 
+
 //        final IntentFilter filter = new IntentFilter();
 //        filter.addAction(ACTION_PLAY_TOGGLE);
 //        filter.addAction(ACTION_PLAY_LAST);
 //        filter.addAction(ACTION_PLAY_NEXT);
 //        filter.addAction(ACTION_STOP_SERVICE);
 //        registerReceiver(mIntentReceiver,filter);
-
+        PublicObject.indexFlag = true;
 
         cycleFlag = true;
         new Thread(new Runnable() {
@@ -184,6 +185,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mPlayer.unregisterCallback(this);
         release();
         stopForeground(true);
         manager.cancel(1000);
@@ -289,20 +291,20 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
             time = time / 6;
         }
         if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
-            if(flag == Player.LISTLOOP){
-                mPlayer.playNext();
-            }else if(flag == Player.SINGLELOOP){
-                mPlayer.playCurrentSong();
-            }else if(flag == Player.RANDLOOP){
-                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
-                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
-            }else if(flag == Player.QUICKRANDLOOP){
-                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
-                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
-            }else{
-                mPlayer.playNext();
-            }
-
+//            if(flag == Player.LISTLOOP){
+//                mPlayer.playNext();
+//            }else if(flag == Player.SINGLELOOP){
+//                mPlayer.playCurrentSong();
+//            }else if(flag == Player.RANDLOOP){
+//                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
+//                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
+//            }else if(flag == Player.QUICKRANDLOOP){
+//                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
+//                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
+//            }else{
+//                mPlayer.playNext();
+//            }
+            mPlayer.playNext();
         }
 
         //showNotification();
