@@ -354,8 +354,6 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
     }
 
     public void initMusicMedia(){
-
-
         int flag = mPlayer.getPlayMode();
         if(flag == Player.LISTLOOP){
             btnPlayWay.setText("列表循环");
@@ -389,8 +387,6 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             if(!tempFlag){
                 position = -1;
             }
-
-            //position = mPlayer.getPosition();
             if(!mPlayer.isPlaying()){
                 btnPause.setVisibility(View.GONE);
                 btnPlay.setVisibility(View.VISIBLE);
@@ -488,6 +484,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         //cycleFlag = false;
         //取消绑定，然后将活动实例在服务中容器移除
         unbindPlaybackService();
+        //停止百度语音引擎
         wakeup.send(SpeechConstant.WAKEUP_STOP, "{}", null, 0, 0);
     }
 //////////////////////////////////////////

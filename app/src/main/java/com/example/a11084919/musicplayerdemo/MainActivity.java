@@ -74,7 +74,7 @@ public class MainActivity extends BaseActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        initView();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "music";
@@ -88,7 +88,6 @@ public class MainActivity extends BaseActivity {
 
         //判断是不是由播放列表活动点击过来的
         if(flag == null){
-
             if(PublicObject.musicList != null){
                 Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
                 startActivity(intent);
@@ -104,23 +103,9 @@ public class MainActivity extends BaseActivity {
                     return;
                 }
             }
-
-
         }
 
         tempMusicList = new ArrayList<>();
-
-
-
-        scan_result_txt = findViewById(R.id.scan_result_txt);
-        btnLocalMusic = findViewById(R.id.btnLocalMusic);
-        txtScanning = findViewById(R.id.txtScanning);
-        imgScan = findViewById(R.id.scan_icon);
-        btnBack = findViewById(R.id.back_button);
-        pbScanning = findViewById(R.id.pbScanning);
-
-
-
         btnLocalMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -175,7 +160,14 @@ public class MainActivity extends BaseActivity {
 
     }
 
-
+    private void initView(){
+        scan_result_txt = findViewById(R.id.scan_result_txt);
+        btnLocalMusic = findViewById(R.id.btnLocalMusic);
+        txtScanning = findViewById(R.id.txtScanning);
+        imgScan = findViewById(R.id.scan_icon);
+        btnBack = findViewById(R.id.back_button);
+        pbScanning = findViewById(R.id.pbScanning);
+    }
 
     private void getMusicFileByMediaStore()
     {

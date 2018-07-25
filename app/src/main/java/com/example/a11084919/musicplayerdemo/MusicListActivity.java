@@ -81,10 +81,11 @@ public class MusicListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
+        initView();
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
@@ -113,8 +114,6 @@ public class MusicListActivity extends BaseActivity {
         });
 
 
-
-        recyclerView = findViewById(R.id.musicRecycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
@@ -126,12 +125,6 @@ public class MusicListActivity extends BaseActivity {
 //        musicAdapterList = new MusicAdapterList(MusicListActivity.this,R.layout.music_item,PublicObject.musicList);
 //        ListView listView = findViewById(R.id.musicListView);
 //        listView.setAdapter(musicAdapterList);
-
-        btnManage = findViewById(R.id.btnManage);
-        LinOutButton = findViewById(R.id.LinOutButton);
-        btnChooseAll = findViewById(R.id.btnChooseAll);
-        btnDelete = findViewById(R.id.btnDelete);
-        imgNext = findViewById(R.id.nav_btn_next);
 
         if(PublicObject.musicList != null){
             int n = PublicObject.musicList.size(),count = 0;
@@ -240,15 +233,16 @@ public class MusicListActivity extends BaseActivity {
 
     }
 
-//    protected void onPause(){
-//        recyclerView.setAdapter(musicAdapterRecycle);
-//        super.onPause();
-//    }
+    private void initView(){
+        drawerLayout = findViewById(R.id.drawer_layout);
+        recyclerView = findViewById(R.id.musicRecycleView);
+        btnManage = findViewById(R.id.btnManage);
+        LinOutButton = findViewById(R.id.LinOutButton);
+        btnChooseAll = findViewById(R.id.btnChooseAll);
+        btnDelete = findViewById(R.id.btnDelete);
+        imgNext = findViewById(R.id.nav_btn_next);
+    }
 
-//    protected void onRestart(){
-//        super.onRestart();
-//
-//    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar,menu);
