@@ -21,6 +21,9 @@ public class Music extends DataSupport{
     private String album;
     //歌曲图片
     private byte[] pic;
+    //音频时长
+    private int duration;
+
 
     //private boolean isPlaying;
 
@@ -81,7 +84,16 @@ public class Music extends DataSupport{
     public void setPic(byte[] pic) {
         this.pic = pic;
     }
-//
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    //
 //    public boolean isPlaying() {
 //        return isPlaying;
 //    }

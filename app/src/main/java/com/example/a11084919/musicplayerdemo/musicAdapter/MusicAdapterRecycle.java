@@ -48,6 +48,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         LinearLayout btnOk;
         TextView txtMusicName;
         TextView txtMusicArtist;
+        TextView txtTimeTotal;
         CheckBox ckChoose;
         FrameLayout btnMusicDelete;
         ImageView imgPlaying;
@@ -58,6 +59,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
             btnOk = view.findViewById(R.id.btnOk);
             txtMusicName = view.findViewById(R.id.music_name);
             txtMusicArtist = view.findViewById(R.id.music_artist);
+            txtTimeTotal = view.findViewById(R.id.txt_total_time);
             btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
             ckChoose = view.findViewById(R.id.ckChoose);
             imgPlaying = view.findViewById(R.id.imgPlaying);
@@ -151,7 +153,9 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
         holder.txtMusicName.setText(music.getTitle());
         holder.txtMusicArtist.setText(music.getArtist());
-
+        int time = music.getDuration()/1000;
+        String str = String.format("%02d:%02d", time/ 60 % 60, time % 60);
+        holder.txtTimeTotal.setText(str);
 //        //异步加载图片
 //        LoadPicture task = new LoadPicture(holder.imgAlbum);
 //        task.execute(music);

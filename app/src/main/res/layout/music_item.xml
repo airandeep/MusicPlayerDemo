@@ -2,99 +2,100 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:background="#1ADDF9FF"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="65dp"
     android:layout_margin="1dp">
 
-    <!--<View-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
-    <LinearLayout
-        android:id="@+id/btnOk"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:background="@drawable/recycler_item_selector">
-        <CheckBox
-            android:id="@+id/ckChoose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:visibility="gone"/>
 
-        <!--<ImageView-->
+        <LinearLayout
+            android:id="@+id/btnOk"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="@drawable/recycler_item_selector"
+            android:gravity="center_vertical">
+            <CheckBox
+                android:id="@+id/ckChoose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:visibility="gone"/>
+
+            <!--<ImageView-->
             <!--android:layout_gravity="center_vertical"-->
             <!--android:id="@+id/imgAlbum"-->
             <!--android:layout_width="65dp"-->
             <!--android:layout_height="65dp"-->
             <!--android:src="@drawable/airan_launch"/>-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center"
-            android:layout_marginLeft="5dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center">
-                <ImageView
-                    android:id="@+id/imgPlaying"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:src="@drawable/playing"
-                    android:visibility="gone"/>
-                <TextView
-                    android:id="@+id/music_name"
+                android:orientation="vertical"
+                android:layout_marginLeft="5dp">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:singleLine="true"
-                    android:text="菊花台"
-                    android:textSize="26dp"
-                    android:textColor="#545454"/>
+                    android:gravity="center">
+                    <ImageView
+                        android:id="@+id/imgPlaying"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/playing"
+                        android:visibility="gone"/>
+                    <TextView
+                        android:id="@+id/music_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:singleLine="true"
+                        android:text="菊花台"
+                        android:textSize="20dp"
+                        android:textColor="#545454"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/music_artist"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:textSize="20dp"
+                        android:text="周杰伦"/>
+                    <TextView
+                        android:id="@+id/txt_total_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3:42"/>
+                </LinearLayout>
+
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/music_artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:textSize="18dp"
-                android:text="周杰伦"/>
         </LinearLayout>
 
-    </LinearLayout>
+        <FrameLayout
+            android:id="@+id/btnMusicDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
+            android:background="@drawable/recycler_item_selector">
 
-    <FrameLayout
-        android:id="@+id/btnMusicDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:paddingRight="8dp"
-        android:paddingLeft="8dp"
-        android:background="@drawable/recycler_item_selector">
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/image_button_action"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_list_item_action"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                />
+        </FrameLayout>
 
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/image_button_action"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:scaleType="center"
-            app:srcCompat="@drawable/ic_list_item_action"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
-    </FrameLayout>
-    <!--<Button-->
-    <!--android:id="@+id/btnMusicDelete"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:textSize="20dp"-->
-    <!--android:layout_gravity="center_vertical"-->
-    <!--android:text="DELETE"/>-->
 
 
 </LinearLayout>

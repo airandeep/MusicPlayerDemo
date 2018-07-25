@@ -1,13 +1,17 @@
 package com.example.a11084919.musicplayerdemo;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -26,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
+import com.example.a11084919.musicplayerdemo.asrBaidu.MiniWakeUp;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
@@ -35,6 +40,7 @@ import com.example.a11084919.musicplayerdemo.play.PlayService;
 
 import org.litepal.crud.DataSupport;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MusicListActivity extends BaseActivity {
@@ -232,7 +238,6 @@ public class MusicListActivity extends BaseActivity {
             }
         });
 
-
     }
 
 //    protected void onPause(){
@@ -309,7 +314,6 @@ public class MusicListActivity extends BaseActivity {
 
         super.onDestroy();
     }
-
 
     //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {

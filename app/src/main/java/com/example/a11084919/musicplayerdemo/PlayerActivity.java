@@ -1,13 +1,21 @@
 package com.example.a11084919.musicplayerdemo;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -17,7 +25,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.baidu.speech.EventListener;
+import com.baidu.speech.EventManager;
+import com.baidu.speech.EventManagerFactory;
+import com.baidu.speech.asr.SpeechConstant;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.play.IPlay;
@@ -25,10 +38,21 @@ import com.example.a11084919.musicplayerdemo.play.PlayService;
 import com.example.a11084919.musicplayerdemo.play.Player;
 
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
 import static java.lang.Thread.sleep;
 
-public class PlayerActivity extends BaseActivity implements IPlay.Callback{
+public class PlayerActivity extends BaseActivity implements IPlay.Callback,EventListener {
 
+    private static final int NEXTSONG = 0;
+    private static final int LASTSONG = 1;
+    private static final int PAUSESONG = 2;
+    private static final int PLAYSONG = 3;
+    private static final int SHOWINFO = 4;
     //MediaPlayer实例化的对象必须手动mediaPlayer.stop(); mediaPlayer.release();释放，即使当前活动
     ////
     private static String TAG = "PlayerActivity";
@@ -38,6 +62,9 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     private SeekBar SBMusicInfo;
     private TextView txtTimeNow;
     private TextView txtTimeMax;
+    private TextView txtVoiceInfo;
+
+    private String strShow;
 
 
     private Button btnPlay;
@@ -46,13 +73,12 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     private Button btnNext;
     private Button btnBack;
     private Button btnPlayWay;
+    private Button btnStartVoice;
     private ImageView imgShow;
-    Bitmap bmpMp3;
+    private Bitmap bmpMp3;
 
     private boolean notiFlag;
-
-    //private String path;
-    //private String name;
+    private boolean isUseVoice;
     private int position;
 
 
@@ -78,30 +104,76 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         }
     };
 
+    //语音识别
+    private EventManager wakeup;
 
+    //语音回调通过Handler机制进行反应
+    Handler mHandler = new Handler(){
+        public void handleMessage(Message msg){
+            switch (msg.what){
+                case SHOWINFO:{
+                    txtVoiceInfo.setText(strShow);
+                    break;
+                }
+                case NEXTSONG:{
+                    mPlayer.playNext();
+                    Toast.makeText(PlayerActivity.this,"已通过语音切换到下一首",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case LASTSONG:{
+                    mPlayer.playLast();
+                    Toast.makeText(PlayerActivity.this,"已通过语音切换到上一首",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case PAUSESONG:{
+                    if(mPlayer.isPlaying()){
+                        mPlayer.pause();
+                        btnPause.setVisibility(View.GONE);
+                        btnPlay.setVisibility(View.VISIBLE);
+                        imgShow.clearAnimation();
+                        Toast.makeText(PlayerActivity.this,"已通过语音暂停本歌曲",Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(PlayerActivity.this,"目前已在暂停状态",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                }
+                case PLAYSONG:{
+                    if(mPlayer.isPlaying()){
+                        Toast.makeText(PlayerActivity.this,"目前已在播放状态",Toast.LENGTH_SHORT).show();
+                    }else{
+                        mPlayer.rePlay();
+                        btnPause.setVisibility(View.VISIBLE);
+                        btnPlay.setVisibility(View.GONE);
+                        imgShow.startAnimation(animation);
+                        Toast.makeText(PlayerActivity.this,"已通过语音播放本歌曲",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                }
+                default:{
+                    break;
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+        initView();
 
-        txtMusicName = findViewById(R.id.txtMusicName);
-        txtMusic = findViewById(R.id.txtMusic);
-        SBMusicInfo = findViewById(R.id.SBMusicInfo);
-        txtTimeNow = findViewById(R.id.txtTimeNow);
-        txtTimeMax = findViewById(R.id.txtTimeMax);
-        btnPlay = findViewById(R.id.btnPlay);
-        btnPause = findViewById(R.id.btnPause);
-        btnPre = findViewById(R.id.btnPre);
-        btnNext = findViewById(R.id.btnNext);
-        btnBack = findViewById(R.id.back_button);
-        btnPlayWay = findViewById(R.id.btnPlayWay);
-        imgShow = findViewById(R.id.imgShow);
+        isUseVoice = true;
+
+        //初始化语音操作
+        initPermission();
+        wakeup = EventManagerFactory.create(this, "wp");
+        wakeup.registerListener(this); //  EventListener 中 onEvent方法
 
         //使图片按照anim中img_animation.xml设置的参数进行旋转··
         animation = AnimationUtils.loadAnimation(this,R.anim.img_animation);
         LinearInterpolator lin = new LinearInterpolator();
         animation.setInterpolator(lin);
+
 
 
        //绑定本活动与服务
@@ -172,6 +244,26 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
             }
         });
 
+        btnStartVoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isUseVoice){
+                    String strFlag = btnStartVoice.getText().toString();
+                    if(strFlag.equals("开启语音")){
+                        start();
+                        btnStartVoice.setText("关闭语音");
+                    }else{
+                        stop();
+                        btnStartVoice.setText("开启语音");
+                    }
+                }else{
+                    Toast.makeText(PlayerActivity.this,"      请授予相关权限\n方可使用语音相关功能",Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+        });
+
         SBMusicInfo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -194,6 +286,71 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         });
 
 
+    }
+    //开启语音操作
+    private void start() {
+
+        Map<String, Object> params = new TreeMap();
+
+        params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME, false);
+        params.put(SpeechConstant.WP_WORDS_FILE, "assets:///WakeUp.bin");
+        // "assets:///WakeUp.bin" 表示WakeUp.bin文件定义在assets目录下
+        String json = null; // 这里可以替换成你需要测试的json
+        json = new JSONObject(params).toString();
+        wakeup.send(SpeechConstant.WAKEUP_START, json, null, 0, 0);
+        txtVoiceInfo.setText("已开启语音识别功能");
+        txtVoiceInfo.setTextColor(Color.parseColor("#00FF00"));
+        Toast.makeText(PlayerActivity.this,"已开启语音识别功能",Toast.LENGTH_SHORT).show();
+    }
+    private void stop() {
+        wakeup.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0); //
+        txtVoiceInfo.setText("已停止语音识别功能");
+        txtVoiceInfo.setTextColor(Color.parseColor("#FF0000"));
+        Toast.makeText(PlayerActivity.this,"已停止语音识别功能",Toast.LENGTH_SHORT).show();
+    }
+
+
+    //   EventListener  回调方法
+    public void onEvent(String name, String params, byte[] data, int offset, int length) {
+        try {
+            JSONObject jsonObject = new JSONObject(params);
+            String errorDesc = jsonObject.getString("errorDesc");
+            String errorCode = jsonObject.getString("errorCode");
+            String word = jsonObject.getString("word");
+
+            mHandler.sendEmptyMessage(SHOWINFO);
+            strShow = "AIRAN识别结果" + errorDesc + " " + errorCode + " " + word;
+            //Log.d("AIRAN", errorDesc + " " + errorCode + " " + word);
+            if(word.equals("下一首")){
+                mHandler.sendEmptyMessage(NEXTSONG);
+            }else if(word.equals("上一首")){
+                mHandler.sendEmptyMessage(LASTSONG);
+            }else if(word.equals("暂停")){
+                mHandler.sendEmptyMessage(PAUSESONG);
+            }else if(word.equals("播放")){
+                mHandler.sendEmptyMessage(PLAYSONG);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void initView(){
+        txtMusicName = findViewById(R.id.txtMusicName);
+        txtMusic = findViewById(R.id.txtMusic);
+        SBMusicInfo = findViewById(R.id.SBMusicInfo);
+        txtTimeNow = findViewById(R.id.txtTimeNow);
+        txtTimeMax = findViewById(R.id.txtTimeMax);
+        txtVoiceInfo = findViewById(R.id.txt_voice_info);
+        btnPlay = findViewById(R.id.btnPlay);
+        btnPause = findViewById(R.id.btnPause);
+        btnPre = findViewById(R.id.btnPre);
+        btnNext = findViewById(R.id.btnNext);
+        btnBack = findViewById(R.id.back_button);
+        btnPlayWay = findViewById(R.id.btnPlayWay);
+        btnStartVoice = findViewById(R.id.btn_start_voice);
+        imgShow = findViewById(R.id.imgShow);
     }
 
     public void initMusicMedia(){
@@ -326,12 +483,12 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
     }
 
     public void onDestroy(){
+        super.onDestroy();
         //将本活动创建的子线程中的循环参数设置为false，跳出此子线程//一定要跳出，否则每次此线程会存在，下一次创建活动会再次起一个新线程导致
         //cycleFlag = false;
         //取消绑定，然后将活动实例在服务中容器移除
         unbindPlaybackService();
-
-        super.onDestroy();
+        wakeup.send(SpeechConstant.WAKEUP_STOP, "{}", null, 0, 0);
     }
 //////////////////////////////////////////
     //这里只负责切换显示，切换歌曲已经在服务中完成了
@@ -430,4 +587,48 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback{
         txtTimeNow.setText(str);
         SBMusicInfo.setProgress(max * position / time);
     }
+
+    /**
+     * android 6.0 以上需要动态申请权限//申请录音权限和录音权限
+     */
+    private void initPermission() {
+        String permissions[] = {Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.INTERNET
+        };
+
+        ArrayList<String> toApplyList = new ArrayList<String>();
+
+        for (String perm : permissions) {
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {
+                toApplyList.add(perm);
+                // 进入到这里代表没有权限.
+
+            }
+        }
+        String tmpList[] = new String[toApplyList.size()];
+        if (!toApplyList.isEmpty()) {
+            ActivityCompat.requestPermissions(this, toApplyList.toArray(tmpList), 123);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // 此处为android 6.0以上动态授权的回调，用户自行实现。
+        switch (requestCode){
+            case 123:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                }else{
+                    Toast.makeText(this,"未能获取智能语音使用相关权限\n授权后方可使用智能语音相关功能",Toast.LENGTH_SHORT).show();
+                    isUseVoice = false;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+
 }

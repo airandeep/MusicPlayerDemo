@@ -75,6 +75,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "music";
             String channelName = "音乐通知";
@@ -197,6 +198,8 @@ public class MainActivity extends BaseActivity {
                 String album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)); // 专辑
                 String artist = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)); // 作者
                 String title = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));//歌曲名字
+                //String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                int duration = c.getInt(c.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));//歌曲时长
                 byte[] pic = mmr.getEmbeddedPicture();
 
                 music.setPath(path);
@@ -209,6 +212,7 @@ public class MainActivity extends BaseActivity {
                 music.setArtist(artist);
                 music.setTitle(title);
                 music.setPic(pic);
+                music.setDuration(duration);
                 music.save();
                 tempMusicList.add(music);
             }
@@ -245,7 +249,7 @@ public class MainActivity extends BaseActivity {
                                 String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                                 String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
                                 String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                                //String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                                String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
                                 byte[] pic = mmr.getEmbeddedPicture();
 
                                 music.setPath(file.toString());
@@ -273,6 +277,7 @@ public class MainActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+
 
     //应用权限申请回调
     public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantsResults){

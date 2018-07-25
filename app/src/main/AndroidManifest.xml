@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
@@ -12,6 +16,22 @@
         android:roundIcon="@drawable/airan_launch"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="11580804" />
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="PzTHtXA7PDyefoe73d6W00Ut" />
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="VKtam94n2cvA91NBErlRkOcYq39Bd5GF" />
+        <!-- 请确认集成后的包名是否正确，本demo的包名是com.baidu.speech.recognizerdemo，在build.gradle文件中查看 -->
+        <service
+            android:name="com.baidu.speech.VoiceRecognitionService"
+            android:exported="false" />
+
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
