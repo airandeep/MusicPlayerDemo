@@ -41,7 +41,7 @@
                         android:id="@+id/imgPlaying"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/playing"
+                        android:src="@drawable/playing1"
                         android:visibility="gone"/>
                     <TextView
                         android:id="@+id/music_name"

@@ -10,5 +10,7 @@ public class PublicObject {
     public static int[] musicIndexs = new int[2];
 
     public static boolean indexFlag = false;
+
+    public static boolean threadFlag = true;
     //public static int playingIndex;
 }

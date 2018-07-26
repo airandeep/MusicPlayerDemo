@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:padding="10dp"
+    android:layout_height="300dp"
     android:background="?attr/colorPrimary">
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/icon_image"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:src="@drawable/picture_default"
-        android:layout_centerInParent="true"/>
+    <ImageView
+        android:id="@+id/nav_head_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/picture_default"/>
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/nav_head_play_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/mail"
+        android:layout_above="@id/nav_head_play_singer"
         android:text="菊花台"
         android:textColor="#FFF"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:singleLine="true"/>
     <TextView
-        android:id="@+id/mail"
+        android:id="@+id/nav_head_play_singer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

@@ -19,11 +19,12 @@
                 android:background="?attr/colorPrimary"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-            <Button
-                android:id="@+id/btnManage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="管理"/>
+            <!--<Button-->
+                <!--android:id="@+id/btnManage"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_horizontal"-->
+                <!--android:text="管理"/>-->
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/musicRecycleView"
                 android:layout_weight="1"
@@ -48,7 +49,13 @@
                     android:text="删除"/>
 
             </LinearLayout>
-            <include layout="@layout/bottom_nav"/>
+            <FrameLayout
+                android:id="@+id/bottom_nav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <include layout="@layout/bottom_nav"/>
+            </FrameLayout>
+
         </LinearLayout>
 
     </FrameLayout>

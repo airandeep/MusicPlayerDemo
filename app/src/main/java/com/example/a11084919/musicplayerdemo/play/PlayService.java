@@ -87,30 +87,17 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         mPlayer = Player.getInstance();
         mPlayer.registerCallback(this);//将本服务存到mPlay实例化对象中容器mCallbacks
 
-
+        PublicObject.threadFlag = true;
 //        final IntentFilter filter = new IntentFilter();
 //        filter.addAction(ACTION_PLAY_TOGGLE);
 //        filter.addAction(ACTION_PLAY_LAST);
 //        filter.addAction(ACTION_PLAY_NEXT);
 //        filter.addAction(ACTION_STOP_SERVICE);
 //        registerReceiver(mIntentReceiver,filter);
-        PublicObject.indexFlag = true;
 
-        cycleFlag = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (cycleFlag){
-                    try{
-                        sleep(milliseconds);
-                    }catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
-                    mHandler.sendEmptyMessage(0);
-                }
-            }
-        }).start();
     }
+
+
 
 //    private void handleCommandIntent(Intent intent){
 //        final String command = intent.getAction();
@@ -197,6 +184,27 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         return binder;
+    }
+
+    public void startThread(){
+        if(PublicObject.threadFlag){
+            PublicObject.threadFlag = false;
+            PublicObject.indexFlag = true;
+            cycleFlag = true;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (cycleFlag){
+                        try{
+                            sleep(milliseconds);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                        mHandler.sendEmptyMessage(0);
+                    }
+                }
+            }).start();
+        }
     }
 
     public boolean play(int position,String musicPath,boolean notiFlag){

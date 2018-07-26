@@ -45,7 +45,7 @@ public class Player implements IPlay {
 
     //因为PlayService也继承了此接口mCallbacks，所以可以将服务实例化对象存在此集合mCallbacks中
     //然后在使用
-    private List<Callback> mCallbacks = new ArrayList<>(2);
+    private List<Callback> mCallbacks = new ArrayList<>(3);
 
     private Player(){
         mediaPlayer = new MediaPlayer();//media刚创建时处于Idle状态
@@ -68,7 +68,7 @@ public class Player implements IPlay {
         return sInstance;
     }
 
-
+    public void startThread(){}
 
     public boolean play(int position,String musicPath,boolean notiFlag){
         if(notiFlag || musicPath.equals(getCurrentMusic() == null ? "" : getCurrentMusic().getPath())){

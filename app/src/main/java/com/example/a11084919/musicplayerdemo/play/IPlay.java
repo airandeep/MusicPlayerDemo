@@ -4,6 +4,8 @@ package com.example.a11084919.musicplayerdemo.play;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
 public interface IPlay {
+    void startThread();
+
     boolean play(int position,String musicPath,boolean notiFlag);
 
     void release();

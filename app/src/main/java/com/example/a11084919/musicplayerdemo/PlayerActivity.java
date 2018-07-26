@@ -287,6 +287,55 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
 
 
     }
+
+    private void initView(){
+        txtMusicName = findViewById(R.id.txtMusicName);
+        txtMusic = findViewById(R.id.txtMusic);
+        SBMusicInfo = findViewById(R.id.SBMusicInfo);
+        txtTimeNow = findViewById(R.id.txtTimeNow);
+        txtTimeMax = findViewById(R.id.txtTimeMax);
+        txtVoiceInfo = findViewById(R.id.txt_voice_info);
+        btnPlay = findViewById(R.id.btnPlay);
+        btnPause = findViewById(R.id.btnPause);
+        btnPre = findViewById(R.id.btnPre);
+        btnNext = findViewById(R.id.btnNext);
+        btnBack = findViewById(R.id.back_button);
+        btnPlayWay = findViewById(R.id.btnPlayWay);
+        btnStartVoice = findViewById(R.id.btn_start_voice);
+        imgShow = findViewById(R.id.imgShow);
+    }
+
+    /**
+     * android 6.0 以上需要动态申请权限//申请录音权限和录音权限
+     */
+    private void initPermission() {
+        String permissions[] = {Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.INTERNET
+        };
+
+        ArrayList<String> toApplyList = new ArrayList<String>();
+
+        for (String perm : permissions) {
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {
+                toApplyList.add(perm);
+                // 进入到这里代表没有权限.
+
+            }
+        }
+        String tmpList[] = new String[toApplyList.size()];
+        if (!toApplyList.isEmpty()) {
+            ActivityCompat.requestPermissions(this, toApplyList.toArray(tmpList), 123);
+        }
+
+    }
+
+    private void bindPlayService(){
+        Intent bindIntent = new Intent(this,PlayService.class);
+        startService(bindIntent);
+        bindService(bindIntent,connection,BIND_AUTO_CREATE);
+    }
+
     //开启语音操作
     private void start() {
 
@@ -336,24 +385,12 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
 
     }
 
-    private void initView(){
-        txtMusicName = findViewById(R.id.txtMusicName);
-        txtMusic = findViewById(R.id.txtMusic);
-        SBMusicInfo = findViewById(R.id.SBMusicInfo);
-        txtTimeNow = findViewById(R.id.txtTimeNow);
-        txtTimeMax = findViewById(R.id.txtTimeMax);
-        txtVoiceInfo = findViewById(R.id.txt_voice_info);
-        btnPlay = findViewById(R.id.btnPlay);
-        btnPause = findViewById(R.id.btnPause);
-        btnPre = findViewById(R.id.btnPre);
-        btnNext = findViewById(R.id.btnNext);
-        btnBack = findViewById(R.id.back_button);
-        btnPlayWay = findViewById(R.id.btnPlayWay);
-        btnStartVoice = findViewById(R.id.btn_start_voice);
-        imgShow = findViewById(R.id.imgShow);
-    }
+
 
     public void initMusicMedia(){
+        //开启服务内部线程//但是内部方法只会执行一次
+        mPlayer.startThread();
+
         int flag = mPlayer.getPlayMode();
         if(flag == Player.LISTLOOP){
             btnPlayWay.setText("列表循环");
@@ -447,11 +484,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
 
     }
 
-    private void bindPlayService(){
-        Intent bindIntent = new Intent(this,PlayService.class);
-        startService(bindIntent);
-        bindService(bindIntent,connection,BIND_AUTO_CREATE);
-    }
+
 
     private void unbindPlaybackService(){
         //并不会调用onServiceDisconnected方法
@@ -585,30 +618,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         SBMusicInfo.setProgress(max * position / time);
     }
 
-    /**
-     * android 6.0 以上需要动态申请权限//申请录音权限和录音权限
-     */
-    private void initPermission() {
-        String permissions[] = {Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.INTERNET
-        };
 
-        ArrayList<String> toApplyList = new ArrayList<String>();
-
-        for (String perm : permissions) {
-            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {
-                toApplyList.add(perm);
-                // 进入到这里代表没有权限.
-
-            }
-        }
-        String tmpList[] = new String[toApplyList.size()];
-        if (!toApplyList.isEmpty()) {
-            ActivityCompat.requestPermissions(this, toApplyList.toArray(tmpList), 123);
-        }
-
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

@@ -75,7 +75,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     }
 
 
-    private  ViewHolder[] tempHolder = new ViewHolder[2];
+    //private  ViewHolder[] tempHolder = new ViewHolder[2];
     //此方法是资源文件musicList里有有多少就执行多少次？？？
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -89,14 +89,14 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                 if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
                     int position = holder.getAdapterPosition();
 
-                    tempHolder[0] = tempHolder[1];
-                    tempHolder[1] = holder;
-                    if(tempHolder[0] != null){
-                        //tempHolder[0].txtMusicName.setTextColor(Color.parseColor("#545454"));
-                        tempHolder[0].imgPlaying.setVisibility(View.GONE);
-                    }
-                    //tempHolder[1].txtMusicName.setTextColor(Color.parseColor("#0000FF"));
-                    tempHolder[1].imgPlaying.setVisibility(View.VISIBLE);
+//                    tempHolder[0] = tempHolder[1];
+//                    tempHolder[1] = holder;
+//                    if(tempHolder[0] != null){
+//                        //tempHolder[0].txtMusicName.setTextColor(Color.parseColor("#545454"));
+//                        tempHolder[0].imgPlaying.setVisibility(View.GONE);
+//                    }
+//                    //tempHolder[1].txtMusicName.setTextColor(Color.parseColor("#0000FF"));
+//                    tempHolder[1].imgPlaying.setVisibility(View.VISIBLE);
 
 
 
@@ -221,6 +221,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     public void setEditMode(int editMode) {
         mEditMode = editMode;
         notifyDataSetChanged();//此操作会导致适配器中每个元素都执行一遍onBindViewHolder
+
     }
 
 
