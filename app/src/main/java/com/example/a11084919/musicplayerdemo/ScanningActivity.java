@@ -32,9 +32,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity {
+public class ScanningActivity extends BaseActivity {
 
-    private static String TAG = "MainActivity";
+    private static String TAG = "ScanningActivity";
     //private boolean cycleFlag;
     private String strShow;
 
@@ -89,7 +89,7 @@ public class MainActivity extends BaseActivity {
         //判断是不是由播放列表活动点击过来的
         if(flag == null){
             if(PublicObject.musicList != null){
-                Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+                Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                 startActivity(intent);
                 finish();
                 return;
@@ -97,7 +97,7 @@ public class MainActivity extends BaseActivity {
                 tempMusicList = DataSupport.findAll(Music.class);
                 if(tempMusicList.size()>0){
                     PublicObject.musicList = tempMusicList;
-                    Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+                    Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                     startActivity(intent);
                     finish();
                     return;
@@ -112,7 +112,7 @@ public class MainActivity extends BaseActivity {
                 String btnTxt = btnLocalMusic.getText().toString();
                 //再次点击此控件时，静态成员变量musicList中已经存在元素直接跳到播放列表界面
                 if(btnTxt.equals("进入播放列表")){
-                    Intent intent = new Intent(MainActivity.this,MusicListActivity.class);
+                    Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                     //必须关闭掉播放列表活动，然后重新创建，因为数据已经刷新了//由于集合List已经更新，不能在用之前的适配器了
                     ActivityCollector.finishAll();
                     startActivity(intent);
@@ -120,8 +120,8 @@ public class MainActivity extends BaseActivity {
                     DataSupport.deleteAll(Music.class);
                     //初始化MediaMetadataRetriever类获取歌曲相关信息
                     mmr =  new MediaMetadataRetriever();
-                    if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                    if(ContextCompat.checkSelfPermission(ScanningActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(ScanningActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
                     }else{
                         btnLocalMusic.setVisibility(View.GONE);
                         txtScanning.setVisibility(View.VISIBLE);
@@ -193,6 +193,7 @@ public class MainActivity extends BaseActivity {
                 //String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
                 int duration = c.getInt(c.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));//歌曲时长
                 byte[] pic = mmr.getEmbeddedPicture();
+                //mmr.getFrameAtTime(3);
 
                 music.setPath(path);
                 music.setName(name);

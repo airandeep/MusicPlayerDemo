@@ -8,7 +8,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp"
+        android:gravity="center_vertical">
         <LinearLayout
             android:id="@+id/bottom_nav_info"
             android:layout_weight="1"
@@ -17,10 +18,8 @@
             android:background="@drawable/recycler_item_selector">
             <ImageView
                 android:id="@+id/img_show"
-                android:layout_width="43dp"
-                android:layout_height="43dp"
-                android:layout_marginLeft="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:src="@drawable/picture_default"/>
             <LinearLayout
                 android:layout_weight="1"

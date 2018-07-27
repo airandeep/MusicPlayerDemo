@@ -1,18 +1,14 @@
 package com.example.a11084919.musicplayerdemo;
 
-import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -33,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
-import com.example.a11084919.musicplayerdemo.asrBaidu.MiniWakeUp;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
@@ -44,8 +39,9 @@ import com.example.a11084919.musicplayerdemo.play.PlayService;
 
 import org.litepal.crud.DataSupport;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
@@ -105,48 +101,33 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
+
         initView();
         //将本活动与服务绑定
         bindPlayService();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+            actionBar.setTitle("库");
         }
 
         //将nav_call设置为默认选中
         navigationView.setCheckedItem(R.id.nav_play_list);
+        setupDrawerContent(navigationView);
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                drawerLayout.closeDrawers();
-                switch(item.getItemId()){
-                    case R.id.nav_play_list:{
-                        Toast.makeText(MusicListActivity.this,"播放列表",Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    default:{
-
-                        break;
-                    }
-                }
-                ;
-                return true;
-            }
-        });
-
-
+//        Map<String,List<Music>> a = new HashMap<>();
+//        a.get("dfdf");
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
-        musicAdapterRecycle = new MusicAdapterRecycle(connection,MusicListActivity.this, PublicObject.musicList);
+        musicAdapterRecycle = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
         recyclerView.setAdapter(musicAdapterRecycle);
 
 
@@ -166,17 +147,6 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
             }
 
         }
-
-
-
-//        btnManage.setOnClickListener(new View.OnClickListener(){
-//            public void onClick(View v){
-//                btnManage.setVisibility(View.GONE);
-//                LinOutButton.setVisibility(View.VISIBLE);
-//                musicAdapterRecycle.setEditMode(1);
-//                stateNow = STATE_MANAGE;
-//            }
-//        });
 
         btnChooseAll.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
@@ -293,7 +263,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
 //                Intent intent = new Intent(Intent.ACTION_MAIN);
 //                intent.addCategory(Intent.CATEGORY_LAUNCHER);
-//                ComponentName cn = new ComponentName("com.zhihu.android","com.zhihu.android.app.ui.activity.MainActivity");
+//                ComponentName cn = new ComponentName("com.zhihu.android","com.zhihu.android.app.ui.activity.ScanningActivity");
 //                intent.setComponent(cn);
 //                startActivity(intent);
                 if(PublicObject.threadFlag){
@@ -305,8 +275,6 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         });
 
     }
-
-
 
     private void initView(){
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -333,15 +301,34 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         musicProgress = findViewById(R.id.music_progress);
     }
 
+    private void setupDrawerContent(NavigationView navigationView){
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                drawerLayout.closeDrawers();
+                switch(item.getItemId()){
+                    case R.id.nav_play_list:{
+                        Toast.makeText(MusicListActivity.this,"库",Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    default:{
+
+                        break;
+                    }
+                }
+                ;
+                return true;
+            }
+        });
+    }
+
+
     private void bindPlayService(){
         Intent bindIntent = new Intent(this,PlayService.class);
         startService(bindIntent);
         bindService(bindIntent,connection,BIND_AUTO_CREATE);
     }
 
-    protected void onResume(){
-        super.onResume();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -357,7 +344,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 break;
             }
             case R.id.homeScanning:{
-                Intent intent = new Intent(MusicListActivity.this,MainActivity.class);
+                Intent intent = new Intent(MusicListActivity.this,ScanningActivity.class);
                 intent.putExtra("extra_flag", "true");
                 startActivity(intent);
                 break;

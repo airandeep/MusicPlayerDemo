@@ -83,7 +83,6 @@ public class Player implements IPlay {
             PublicObject.musicIndexs[1] = position;
 
             try {
-                mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();
@@ -106,7 +105,6 @@ public class Player implements IPlay {
 
     public boolean playCurrentSong(){
         try {
-            mediaPlayer.stop();
             mediaPlayer.reset();
             mediaPlayer.setDataSource(getCurrentMusic().getPath());
             mediaPlayer.prepare();
@@ -170,8 +168,6 @@ public class Player implements IPlay {
             PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
             PublicObject.musicIndexs[1] = position;
             try {
-                //切歌时必须先stop；
-                mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();
@@ -206,7 +202,6 @@ public class Player implements IPlay {
             PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
             PublicObject.musicIndexs[1] = position;
             try {
-                mediaPlayer.stop();
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();

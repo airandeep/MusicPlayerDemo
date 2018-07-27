@@ -40,7 +40,6 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     int mEditMode = 0;
     private static String TAG = "MusicAdapterRecycle";
     private Context mContext;
-    private ServiceConnection mServiceConnection;
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -68,8 +67,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     }
 
     //像适配器中传入数据集合
-    public MusicAdapterRecycle(final ServiceConnection serviceConnection,Context context, List<Music> musicList) {
-        mServiceConnection = serviceConnection;
+    public MusicAdapterRecycle(Context context, List<Music> musicList) {
         mMusicList = musicList;
         mContext = context;
     }
@@ -88,23 +86,6 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
                 if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
                     int position = holder.getAdapterPosition();
-
-//                    tempHolder[0] = tempHolder[1];
-//                    tempHolder[1] = holder;
-//                    if(tempHolder[0] != null){
-//                        //tempHolder[0].txtMusicName.setTextColor(Color.parseColor("#545454"));
-//                        tempHolder[0].imgPlaying.setVisibility(View.GONE);
-//                    }
-//                    //tempHolder[1].txtMusicName.setTextColor(Color.parseColor("#0000FF"));
-//                    tempHolder[1].imgPlaying.setVisibility(View.VISIBLE);
-
-
-
-//                    Intent binIntent = new Intent(mContext, PlayService.class);
-//                    mContext.startService(binIntent);
-//                    mContext.bindService(binIntent,mServiceConnection,Context.BIND_AUTO_CREATE);
-
-
                     Context context = v.getContext();
                     Intent intent = new Intent();
                     intent.putExtra("extra_position", String.valueOf(position));
