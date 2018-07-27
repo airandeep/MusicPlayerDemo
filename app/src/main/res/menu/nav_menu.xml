@@ -4,7 +4,7 @@
         <item
             android:id="@+id/nav_play_list"
             android:icon="@drawable/playlist_play_white"
-            android:title="库" />
+            android:title="播放列表" />
         <item
             android:id="@+id/nav_play_history"
             android:icon="@drawable/library_music_white"
@@ -16,7 +16,7 @@
         <item
             android:id="@+id/nav_album_list"
             android:icon="@drawable/bookmark_music_white"
-            android:title="专辑列表(待做)" />
+            android:title="专辑列表" />
         <item
             android:id="@+id/nav_more_item"
             android:icon="@drawable/help_circle_white"

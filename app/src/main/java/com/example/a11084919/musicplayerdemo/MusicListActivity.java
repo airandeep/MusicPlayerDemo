@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +35,7 @@ import android.support.v7.widget.Toolbar;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
+import com.example.a11084919.musicplayerdemo.musicAdapter.AlbumAdapterRecycle;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterList;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
 import com.example.a11084919.musicplayerdemo.play.IPlay;
@@ -45,15 +49,16 @@ import java.util.Map;
 
 public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
+    private Handler navDrawerRunnable = new Handler();
 
     private static String TAG = "MusicListActivity";
-    //private Button btnManage;
+    private AlbumAdapterRecycle albumAdapterRecycle;
     private MusicAdapterRecycle musicAdapterRecycle;
-    private MusicAdapterList musicAdapterList;
     private LinearLayout LinOutButton;
     private Button btnChooseAll;
     private Button btnDelete;
     private RecyclerView recyclerView;
+
 
     private NavigationView navigationView;
     private View headerView;
@@ -72,11 +77,16 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
     private Bitmap bmpMp3;
 
+    public static int stateNow;
     public static final int STATE_PLAY_ENABLE = 0;
     public static final int STATE_MANAGE = 1;
-    public static int stateNow;
+
+    public static int adapterNow;
+    public static final int ADAPTER_MUSIC = 0;
+    public static final int ADAPTER_ALBUM = 1;
 
     private DrawerLayout drawerLayout;
+    private ActionBar actionBar;
 
     private IPlay mPlayer;
     private PlayService playService;
@@ -86,7 +96,6 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
             playService = ((PlayService.LocalBinder)iBinder).getService();
             mPlayer = playService;
             mPlayer.registerCallback(MusicListActivity.this);
-
             //刷新界面
             onPlayStatusChanged();
         }
@@ -103,37 +112,35 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         setContentView(R.layout.activity_music_list);
 
         initView();
-        //将本活动与服务绑定
-        bindPlayService();
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-            actionBar.setTitle("库");
         }
 
         //将nav_call设置为默认选中
-        navigationView.setCheckedItem(R.id.nav_play_list);
+        if(adapterNow == ADAPTER_ALBUM){
+            navigationView.setCheckedItem(R.id.nav_album_list);
+            bottomNav.setVisibility(View.GONE);
+        }else{
+            navigationView.setCheckedItem(R.id.nav_play_list);
+            bottomNav.setVisibility(View.VISIBLE);
+        }
+
+
         setupDrawerContent(navigationView);
-
-//        Map<String,List<Music>> a = new HashMap<>();
-//        a.get("dfdf");
-
+        //将本活动与服务绑定
+        bindPlayService();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
-        musicAdapterRecycle = new MusicAdapterRecycle(MusicListActivity.this, PublicObject.musicList);
-        recyclerView.setAdapter(musicAdapterRecycle);
-
-
-//        musicAdapterList = new MusicAdapterList(MusicListActivity.this,R.layout.music_item,PublicObject.musicList);
-//        ListView listView = findViewById(R.id.musicListView);
-//        listView.setAdapter(musicAdapterList);
+        //异步实例化适配器
+        new LoadAdapter().execute("");
 
         if(PublicObject.musicList != null){
             int n = PublicObject.musicList.size(),count = 0;
@@ -260,7 +267,6 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 //                Intent intent = new Intent();
 //                intent.setClassName("com.zhihu.android","com.zhihu.android.ui.activity.GuideActivity");
 //                startActivity(intent);
-
 //                Intent intent = new Intent(Intent.ACTION_MAIN);
 //                intent.addCategory(Intent.CATEGORY_LAUNCHER);
 //                ComponentName cn = new ComponentName("com.zhihu.android","com.zhihu.android.app.ui.activity.ScanningActivity");
@@ -308,7 +314,33 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 drawerLayout.closeDrawers();
                 switch(item.getItemId()){
                     case R.id.nav_play_list:{
-                        Toast.makeText(MusicListActivity.this,"库",Toast.LENGTH_SHORT).show();
+                        if(adapterNow != ADAPTER_MUSIC){
+                            //尽管延迟0.5秒执行run中方法降低了反应速度，但是可以防止侧滑掉帧数
+                            navDrawerRunnable.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapterNow = ADAPTER_MUSIC;
+                                    recyclerView.setAdapter(musicAdapterRecycle);
+                                    bottomNav.setVisibility(View.VISIBLE);
+                                    actionBar.setTitle("播放列表");
+                                }
+                            }, 300);
+                        }
+                        break;
+                    }
+                    case R.id.nav_album_list:{
+                        if(adapterNow != ADAPTER_ALBUM){
+                            navDrawerRunnable.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapterNow = ADAPTER_ALBUM;
+                                    recyclerView.setAdapter(albumAdapterRecycle);
+                                    bottomNav.setVisibility(View.GONE);
+                                    actionBar.setTitle("专辑列表");
+                                }
+                            }, 300);
+
+                        }
                         break;
                     }
                     default:{
@@ -316,12 +348,35 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                         break;
                     }
                 }
-                ;
                 return true;
             }
         });
     }
 
+
+    private class LoadAdapter extends AsyncTask<String,Void,String>{
+        @Override
+        protected String doInBackground(String... params) {
+            musicAdapterRecycle = new MusicAdapterRecycle(MusicListActivity.this,PublicObject.musicList);
+            albumAdapterRecycle = new AlbumAdapterRecycle(MusicListActivity.this,PublicObject.albumList);
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            switch (adapterNow){
+                case ADAPTER_MUSIC:{
+                    recyclerView.setAdapter(musicAdapterRecycle);
+                    break;
+                }
+                case ADAPTER_ALBUM:{
+                    recyclerView.setAdapter(albumAdapterRecycle);
+                    break;
+                }
+            }
+
+        }
+    }
 
     private void bindPlayService(){
         Intent bindIntent = new Intent(this,PlayService.class);
@@ -354,12 +409,13 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 break;
             }
             case R.id.settings:{
-                if(stateNow == STATE_PLAY_ENABLE){
-                    bottomNav.setVisibility(View.GONE);
-                    //btnManage.setVisibility(View.GONE);
-                    LinOutButton.setVisibility(View.VISIBLE);
-                    musicAdapterRecycle.setEditMode(1);
-                    stateNow = STATE_MANAGE;
+                if(adapterNow == ADAPTER_MUSIC){
+                    if(stateNow == STATE_PLAY_ENABLE){
+                        bottomNav.setVisibility(View.GONE);
+                        LinOutButton.setVisibility(View.VISIBLE);
+                        musicAdapterRecycle.setEditMode(1);
+                        stateNow = STATE_MANAGE;
+                    }
                 }
                 break;
             }
@@ -412,90 +468,94 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
     }
 
     public void onSwitchLast(){
-        txtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
         txtNavHeadPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
-        txtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
         txtNavHeadPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
-
+        txtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
+        txtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
         if(mPlayer.isPlaying()){
             imgNavControl.setImageResource(R.drawable.btn_pause);
         }else{
             imgNavControl.setImageResource(R.drawable.btn_play);
         }
-
         bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
-            imgShow.setImageResource(R.drawable.picture_default);
             imgNavHeadShow.setImageResource(R.drawable.picture_default);
-        }else{
-            imgShow.setImageBitmap(bmpMp3);
-            imgNavHeadShow.setImageBitmap(bmpMp3);
-        }
-
-        musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
-        musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
-    }
-
-    public void onSwitchNext(){
-        txtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
-        txtNavHeadPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
-        txtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
-        txtNavHeadPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
-
-        if(mPlayer.isPlaying()){
-            imgNavControl.setImageResource(R.drawable.btn_pause);
-        }else{
-            imgNavControl.setImageResource(R.drawable.btn_play);
-        }
-
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
-        if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
-            imgNavHeadShow.setImageResource(R.drawable.picture_default);
         }else{
-            imgShow.setImageBitmap(bmpMp3);
             imgNavHeadShow.setImageBitmap(bmpMp3);
+            imgShow.setImageBitmap(bmpMp3);
         }
 
-        musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
-        musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
-    }
-
-    public void onPlayStatusChanged(){
-        if(!PublicObject.threadFlag){
-            txtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
-            txtNavHeadPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
-            txtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
-            txtNavHeadPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
-
-            if(mPlayer.isPlaying()){
-                imgNavControl.setImageResource(R.drawable.btn_pause);
-            }else{
-                imgNavControl.setImageResource(R.drawable.btn_play);
-            }
-
-            bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
-            if(bmpMp3 == null){
-                imgShow.setImageResource(R.drawable.picture_default);
-                imgNavHeadShow.setImageResource(R.drawable.picture_default);
-            }else{
-                imgShow.setImageBitmap(bmpMp3);
-                imgNavHeadShow.setImageBitmap(bmpMp3);
-            }
-
+        if(adapterNow == ADAPTER_MUSIC){
             musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
             musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
         }
 
     }
+
+    public void onSwitchNext(){
+        txtNavHeadPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
+        txtNavHeadPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
+        txtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
+        txtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
+        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        if(mPlayer.isPlaying()){
+            imgNavControl.setImageResource(R.drawable.btn_pause);
+        }else{
+            imgNavControl.setImageResource(R.drawable.btn_play);
+        }
+        if(bmpMp3 == null){
+            imgNavHeadShow.setImageResource(R.drawable.picture_default);
+            imgShow.setImageResource(R.drawable.picture_default);
+        }else{
+            imgNavHeadShow.setImageBitmap(bmpMp3);
+            imgShow.setImageBitmap(bmpMp3);
+        }
+
+        if(adapterNow == ADAPTER_MUSIC){
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
+        }
+
+    }
+
+    public void onPlayStatusChanged(){
+
+
+        if(!PublicObject.threadFlag){
+            txtNavHeadPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
+            txtNavHeadPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
+            txtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
+            txtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
+            if(mPlayer.isPlaying()){
+                imgNavControl.setImageResource(R.drawable.btn_pause);
+            }else{
+                imgNavControl.setImageResource(R.drawable.btn_play);
+            }
+            bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+            if(bmpMp3 == null){
+                imgNavHeadShow.setImageResource(R.drawable.picture_default);
+                imgShow.setImageResource(R.drawable.picture_default);
+            }else{
+                imgNavHeadShow.setImageBitmap(bmpMp3);
+                imgShow.setImageBitmap(bmpMp3);
+            }
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
+        }
+
+
+
+    }
     //更新活动中进度条//
     public void onUpdateProgressBar(){
-        int currentTime = mPlayer.getProgress();
-        int maxTime = mPlayer.getDuration();
+        if(adapterNow == ADAPTER_MUSIC){
+            int currentTime = mPlayer.getProgress();
+            int maxTime = mPlayer.getDuration();
+            int max = musicProgress.getMax();
+            musicProgress.setProgress(max * currentTime/maxTime);
+        }
 
-        int max = musicProgress.getMax();
-
-        musicProgress.setProgress(max * currentTime/maxTime);
 
 
     }

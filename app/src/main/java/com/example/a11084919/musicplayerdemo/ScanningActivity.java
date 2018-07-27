@@ -73,7 +73,7 @@ public class ScanningActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_scanning);
         initView();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -95,8 +95,23 @@ public class ScanningActivity extends BaseActivity {
                 return;
             }else{
                 tempMusicList = DataSupport.findAll(Music.class);
+
+                //存储专辑静态变量
                 if(tempMusicList.size()>0){
                     PublicObject.musicList = tempMusicList;
+                    int n = tempMusicList.size();
+                    for(int i = 0;i < n;i++){
+                        String key = tempMusicList.get(i).getAlbum();
+                        List<Music> value;
+                        if(PublicObject.musicMap.containsKey(key)){
+                            PublicObject.musicMap.get(key).add(tempMusicList.get(i));
+                        }else{
+                            PublicObject.albumList.add(key);
+                            value = new ArrayList<>();
+                            value.add(tempMusicList.get(i));
+                            PublicObject.musicMap.put(key,value);
+                        }
+                    }
                     Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                     startActivity(intent);
                     finish();
