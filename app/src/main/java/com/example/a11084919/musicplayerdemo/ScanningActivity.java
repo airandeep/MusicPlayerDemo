@@ -60,7 +60,7 @@ public class ScanningActivity extends BaseActivity {
                     pbScanning.setVisibility(View.GONE);
 
                     imgScan.setImageResource(R.drawable.local_scan_ok);
-                    txtScanning.setText("已扫描"+ PublicObject.musicList.size() + "首歌曲");
+                    txtScanning.setText("已扫描"+ PublicObject.allMusicList.size() + "首歌曲");
                     btnLocalMusic.setVisibility(View.VISIBLE);
                     btnLocalMusic.setText("进入播放列表");
                     break;
@@ -88,7 +88,7 @@ public class ScanningActivity extends BaseActivity {
 
         //判断是不是由播放列表活动点击过来的
         if(flag == null){
-            if(PublicObject.musicList != null){
+            if(PublicObject.allMusicList != null){
                 Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                 startActivity(intent);
                 finish();
@@ -98,20 +98,21 @@ public class ScanningActivity extends BaseActivity {
 
                 //存储专辑静态变量
                 if(tempMusicList.size()>0){
-                    PublicObject.musicList = tempMusicList;
-                    int n = tempMusicList.size();
-                    for(int i = 0;i < n;i++){
-                        String key = tempMusicList.get(i).getAlbum();
-                        List<Music> value;
-                        if(PublicObject.musicMap.containsKey(key)){
-                            PublicObject.musicMap.get(key).add(tempMusicList.get(i));
-                        }else{
-                            PublicObject.albumList.add(key);
-                            value = new ArrayList<>();
-                            value.add(tempMusicList.get(i));
-                            PublicObject.musicMap.put(key,value);
-                        }
-                    }
+                    PublicObject.allMusicList = tempMusicList;
+//                    int n = tempMusicList.size();
+//                    for(int i = 0;i < n;i++){
+//                        String key = tempMusicList.get(i).getAlbum();
+//                        List<Music> value;
+//                        if(PublicObject.musicMap.containsKey(key)){
+//                            PublicObject.musicMap.get(key).add(tempMusicList.get(i));
+//                        }else{
+//                            PublicObject.albumList.add(key);
+//                            value = new ArrayList<>();
+//                            value.add(tempMusicList.get(i));
+//                            PublicObject.musicMap.put(key,value);
+//                        }
+//                    }
+                    Functivity.initAlbumList(tempMusicList);
                     Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                     startActivity(intent);
                     finish();
@@ -152,10 +153,12 @@ public class ScanningActivity extends BaseActivity {
 //                                getFileMusic(files);
 
                                 getMusicFileByMediaStore();
-                                if(PublicObject.musicList != null){
-                                    PublicObject.musicList.clear();
+                                if(PublicObject.allMusicList != null){
+                                    PublicObject.allMusicList.clear();
                                 }
-                                PublicObject.musicList = tempMusicList;
+                                PublicObject.allMusicList = tempMusicList;
+                                Functivity.initAlbumList(tempMusicList);
+
                                 mHandler.sendEmptyMessage(1);
                             }
                         }).start();
@@ -306,10 +309,12 @@ public class ScanningActivity extends BaseActivity {
 //                            getFileMusic(files);
 
                             getMusicFileByMediaStore();
-                            if(PublicObject.musicList != null){
-                                PublicObject.musicList.clear();
+                            if(PublicObject.allMusicList != null){
+                                PublicObject.allMusicList.clear();
                             }
-                            PublicObject.musicList = tempMusicList;
+                            PublicObject.allMusicList = tempMusicList;
+                            Functivity.initAlbumList(tempMusicList);
+
                             mHandler.sendEmptyMessage(1);
                         }
                     }).start();
@@ -333,5 +338,7 @@ public class ScanningActivity extends BaseActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+
 
 }

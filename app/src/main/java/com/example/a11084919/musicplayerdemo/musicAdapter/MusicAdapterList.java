@@ -38,11 +38,11 @@ public class MusicAdapterList extends ArrayAdapter<Music>{
         if(convertView == null){//如果当前无view
             view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.btnOk = view.findViewById(R.id.btnOk);
+            viewHolder.btnOk = view.findViewById(R.id.music_info);
             //viewHolder.imgAlbum = view.findViewById(R.id.imgAlbum);
-            viewHolder.txtMusicName = view.findViewById(R.id.music_name);
-            viewHolder.ckChoose = view.findViewById(R.id.ckChoose);
-            viewHolder.btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
+            viewHolder.txtMusicName = view.findViewById(R.id.txt_music_name);
+            viewHolder.ckChoose = view.findViewById(R.id.ck_choose);
+            viewHolder.btnMusicDelete = view.findViewById(R.id.music_delete);
 
             Bitmap bitmap = Functivity.getCover(music.getPic());
             if(bitmap == null){

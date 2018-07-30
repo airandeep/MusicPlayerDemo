@@ -9,11 +9,14 @@ import java.util.Map;
 
 public class PublicObject {
     public static List<Music> musicList;
-    public static List<String> albumList = new ArrayList<>();
 
+    public static List<Music> allMusicList;
+    public static List<Music> albumMusicList;
+
+    public static List<String> albumList = new ArrayList<>();
     public static Map<String,List<Music>> musicMap = new HashMap<>();
     //播放歌曲的前一首与后一首
-    public static int[] musicIndexs = new int[2];
+    public static int[] musicIndex = new int[2];
 
     public static boolean indexFlag = false;
 

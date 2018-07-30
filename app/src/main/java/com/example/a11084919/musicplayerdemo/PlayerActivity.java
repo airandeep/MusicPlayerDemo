@@ -48,20 +48,20 @@ import static java.lang.Thread.sleep;
 
 public class PlayerActivity extends BaseActivity implements IPlay.Callback,EventListener {
 
-    private static final int NEXTSONG = 0;
-    private static final int LASTSONG = 1;
-    private static final int PAUSESONG = 2;
-    private static final int PLAYSONG = 3;
-    private static final int SHOWINFO = 4;
+    private static final int NEXT_SONG = 0;
+    private static final int LAST_SONG = 1;
+    private static final int PAUSE_SONG = 2;
+    private static final int PLAY_SONG = 3;
+    private static final int SHOW_INFO = 4;
     //MediaPlayer实例化的对象必须手动mediaPlayer.stop(); mediaPlayer.release();释放，即使当前活动
     ////
     private static String TAG = "PlayerActivity";
 
     private TextView txtMusicName;
-    private TextView txtMusic;
-    private SeekBar SBMusicInfo;
-    private TextView txtTimeNow;
-    private TextView txtTimeMax;
+    private TextView txtMusicArtist;
+    private SeekBar musicProgress;
+    private TextView txtCurrentTime;
+    private TextView txtMaxTime;
     private TextView txtVoiceInfo;
 
     private String strShow;
@@ -69,10 +69,10 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
 
     private Button btnPlay;
     private Button btnPause;
-    private Button btnPre;
+    private Button btnLast;
     private Button btnNext;
     private Button btnBack;
-    private Button btnPlayWay;
+    private Button btnPlayMode;
     private Button btnStartVoice;
     private ImageView imgShow;
     private Bitmap bmpMp3;
@@ -111,21 +111,21 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
             switch (msg.what){
-                case SHOWINFO:{
+                case SHOW_INFO:{
                     txtVoiceInfo.setText(strShow);
                     break;
                 }
-                case NEXTSONG:{
+                case NEXT_SONG:{
                     mPlayer.playNext();
                     Toast.makeText(PlayerActivity.this,"已通过语音切换到下一首",Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case LASTSONG:{
+                case LAST_SONG:{
                     mPlayer.playLast();
                     Toast.makeText(PlayerActivity.this,"已通过语音切换到上一首",Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case PAUSESONG:{
+                case PAUSE_SONG:{
                     if(mPlayer.isPlaying()){
                         mPlayer.pause();
                         btnPause.setVisibility(View.GONE);
@@ -137,7 +137,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
                     }
                     break;
                 }
-                case PLAYSONG:{
+                case PLAY_SONG:{
                     if(mPlayer.isPlaying()){
                         Toast.makeText(PlayerActivity.this,"目前已在播放状态",Toast.LENGTH_SHORT).show();
                     }else{
@@ -204,7 +204,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             }
         });
 
-        btnPre.setOnClickListener(new View.OnClickListener(){
+        btnLast.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 mPlayer.playLast();
             }
@@ -219,26 +219,26 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onKeyDown(KeyEvent.KEYCODE_BACK,null );
+                finish();
             }
         });
 
-        btnPlayWay.setOnClickListener(new View.OnClickListener() {
+        btnPlayMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String flag = btnPlayWay.getText().toString();
+                String flag = btnPlayMode.getText().toString();
                 if(flag.equals("列表循环")){
                     mPlayer.setPlayMode(Player.SINGLELOOP);
-                    btnPlayWay.setText("单曲循环");
+                    btnPlayMode.setText("单曲循环");
                 }else if(flag.equals("单曲循环")){
                     mPlayer.setPlayMode(Player.RANDLOOP);
-                    btnPlayWay.setText("随机循环");
+                    btnPlayMode.setText("随机循环");
                 }else if(flag.equals("随机循环")){
                     mPlayer.setPlayMode(Player.QUICKRANDLOOP);
-                    btnPlayWay.setText("快速随机");
+                    btnPlayMode.setText("快速随机");
                 }else if(flag.equals("快速随机")){
                     mPlayer.setPlayMode(Player.LISTLOOP);
-                    btnPlayWay.setText("列表循环");
+                    btnPlayMode.setText("列表循环");
                 }
 
             }
@@ -264,7 +264,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             }
         });
 
-        SBMusicInfo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        musicProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             }
@@ -289,20 +289,20 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
     }
 
     private void initView(){
-        txtMusicName = findViewById(R.id.txtMusicName);
-        txtMusic = findViewById(R.id.txtMusic);
-        SBMusicInfo = findViewById(R.id.SBMusicInfo);
-        txtTimeNow = findViewById(R.id.txtTimeNow);
-        txtTimeMax = findViewById(R.id.txtTimeMax);
+        txtMusicName = findViewById(R.id.txt_music_name);
+        txtMusicArtist = findViewById(R.id.txt_music_artist);
+        musicProgress = findViewById(R.id.music_progress);
+        txtCurrentTime = findViewById(R.id.txt_current_time);
+        txtMaxTime = findViewById(R.id.txt_max_time);
         txtVoiceInfo = findViewById(R.id.txt_voice_info);
-        btnPlay = findViewById(R.id.btnPlay);
-        btnPause = findViewById(R.id.btnPause);
-        btnPre = findViewById(R.id.btnPre);
-        btnNext = findViewById(R.id.btnNext);
-        btnBack = findViewById(R.id.back_button);
-        btnPlayWay = findViewById(R.id.btnPlayWay);
+        btnPlay = findViewById(R.id.btn_play);
+        btnPause = findViewById(R.id.btn_pause);
+        btnLast = findViewById(R.id.btn_last);
+        btnNext = findViewById(R.id.btn_next);
+        btnBack = findViewById(R.id.btn_back);
+        btnPlayMode = findViewById(R.id.btn_play_mode);
         btnStartVoice = findViewById(R.id.btn_start_voice);
-        imgShow = findViewById(R.id.imgShow);
+        imgShow = findViewById(R.id.img_show);
     }
 
     /**
@@ -367,17 +367,17 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             String errorCode = jsonObject.getString("errorCode");
             String word = jsonObject.getString("word");
 
-            mHandler.sendEmptyMessage(SHOWINFO);
+            mHandler.sendEmptyMessage(SHOW_INFO);
             strShow = "AIRAN识别结果" + errorDesc + " " + errorCode + " " + word;
             //Log.d("AIRAN", errorDesc + " " + errorCode + " " + word);
             if(word.equals("下一首")){
-                mHandler.sendEmptyMessage(NEXTSONG);
+                mHandler.sendEmptyMessage(NEXT_SONG);
             }else if(word.equals("上一首")){
-                mHandler.sendEmptyMessage(LASTSONG);
+                mHandler.sendEmptyMessage(LAST_SONG);
             }else if(word.equals("暂停")){
-                mHandler.sendEmptyMessage(PAUSESONG);
+                mHandler.sendEmptyMessage(PAUSE_SONG);
             }else if(word.equals("播放")){
-                mHandler.sendEmptyMessage(PLAYSONG);
+                mHandler.sendEmptyMessage(PLAY_SONG);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -393,15 +393,15 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
 
         int flag = mPlayer.getPlayMode();
         if(flag == Player.LISTLOOP){
-            btnPlayWay.setText("列表循环");
+            btnPlayMode.setText("列表循环");
         }else if(flag == Player.SINGLELOOP){
-            btnPlayWay.setText("单曲循环");
+            btnPlayMode.setText("单曲循环");
         }else if(flag == Player.RANDLOOP){
-            btnPlayWay.setText("随机循环");
+            btnPlayMode.setText("随机循环");
         }else if(flag == Player.QUICKRANDLOOP){
-            btnPlayWay.setText("快速随机");
+            btnPlayMode.setText("快速随机");
         }else{
-            btnPlayWay.setText("列表循环");
+            btnPlayMode.setText("列表循环");
         }
         //初期处理
         Intent intent = getIntent();
@@ -457,29 +457,31 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         }
 
         txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
-        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
+        txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
 
 
 
-        int time = mPlayer.getDuration();
+        int maxTime = mPlayer.getDuration();
         //播放器暂停状态进入时刷新一下界面
         if(!mPlayer.isPlaying()){
             btnPause.setVisibility(View.GONE);
             btnPlay.setVisibility(View.VISIBLE);
 
-            int position = mPlayer.getProgress();
-            int max = SBMusicInfo.getMax();
-            int timeTemp = position / 1000;
-            String str = String.format("%02d:%02d", timeTemp / 60 % 60, timeTemp % 60);
-            txtTimeNow.setText(str);
-            SBMusicInfo.setProgress(max * position / time);
+            int currentTime = mPlayer.getProgress();
+            int max = musicProgress.getMax();
+            musicProgress.setProgress(max * currentTime / maxTime);
+
+            currentTime = currentTime / 1000;
+            String str = String.format("%02d:%02d", currentTime / 60 % 60, currentTime % 60);
+            txtCurrentTime.setText(str);
+
         }
         //显示通知栏
         mPlayer.initNotification();
         //设置当前音乐总时间
-        time = time/1000;
-        String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
-        txtTimeMax.setText(str);
+        maxTime = maxTime/1000;
+        String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
+        txtMaxTime.setText(str);
 
 
     }
@@ -492,24 +494,24 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         mPlayer.unregisterCallback(PlayerActivity.this);
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        AudioManager audioManager  = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        switch (keyCode){
-            case KeyEvent.KEYCODE_BACK:
-                finish();
-                Intent intent = new Intent(PlayerActivity.this,MusicListActivity.class);
-                startActivity(intent);
-                break;
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,AudioManager.FX_FOCUS_NAVIGATION_UP);
-                return true;
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,AudioManager.FX_FOCUS_NAVIGATION_UP);
-            default:
-                break;
-        }
-        return true;
-    }
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        AudioManager audioManager  = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+//        switch (keyCode){
+//            case KeyEvent.KEYCODE_BACK:
+//                finish();
+////                Intent intent = new Intent(PlayerActivity.this,MusicListActivity.class);
+////                startActivity(intent);
+//                break;
+//            case KeyEvent.KEYCODE_VOLUME_UP:
+//                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,AudioManager.FX_FOCUS_NAVIGATION_UP);
+//                return true;
+//            case KeyEvent.KEYCODE_VOLUME_DOWN:
+//                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,AudioManager.FX_FOCUS_NAVIGATION_UP);
+//            default:
+//                break;
+//        }
+//        return true;
+//    }
 
     public void onDestroy(){
         super.onDestroy();
@@ -531,9 +533,9 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         btnPlay.setVisibility(View.GONE);
 
         txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
-        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
+        txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
 
-        position = mPlayer.getPosition();
+        //position = mPlayer.getPosition();
         bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
@@ -542,9 +544,9 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         }
 
         //修改当前歌曲显示
-        int time = mPlayer.getDuration()/1000;
-        String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
-        txtTimeMax.setText(str);
+        int maxTime = mPlayer.getDuration()/1000;
+        String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
+        txtMaxTime.setText(str);
     }
     public void onSwitchNext(){
         imgShow.clearAnimation();
@@ -555,9 +557,9 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         btnPlay.setVisibility(View.GONE);
 
         txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
-        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
+        txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
 
-        position = mPlayer.getPosition();
+        //position = mPlayer.getPosition();
 
         bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
@@ -567,24 +569,27 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         }
 
         //修改当前歌曲显示
-        int time = mPlayer.getDuration()/1000;
-        String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
-        txtTimeMax.setText(str);
+        int maxTime = mPlayer.getDuration()/1000;
+        String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
+        txtMaxTime.setText(str);
     }
     public void onPlayStatusChanged() {
         imgShow.clearAnimation();
         if(mPlayer.isPlaying()){
             //使图片按照anim中img_animation.xml设置的参数进行旋转··
             imgShow.startAnimation(animation);
+            btnPause.setVisibility(View.VISIBLE);
+            btnPlay.setVisibility(View.GONE);
+        }else{
+            btnPause.setVisibility(View.GONE);
+            btnPlay.setVisibility(View.VISIBLE);
         }
 
-        btnPause.setVisibility(View.VISIBLE);
-        btnPlay.setVisibility(View.GONE);
 
         txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
-        txtMusic.setText(mPlayer.getCurrentMusic().getArtist());
+        txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
 
-        position = mPlayer.getPosition();
+       // position = mPlayer.getPosition();
 
         bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
@@ -594,28 +599,22 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         }
 
         //修改当前歌曲显示
-        int time = mPlayer.getDuration()/1000;
-        String str = String.format("%02d:%02d", time / 60 % 60, time % 60);
-        txtTimeMax.setText(str);
+        int maxTime = mPlayer.getDuration()/1000;
+        String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
+        txtMaxTime.setText(str);
 
-        if(mPlayer.isPlaying()){
-            btnPause.setVisibility(View.VISIBLE);
-            btnPlay.setVisibility(View.GONE);
-        }else{
-            btnPause.setVisibility(View.GONE);
-            btnPlay.setVisibility(View.VISIBLE);
-        }
     }
 
     public void onUpdateProgressBar(){
 
-        int position = mPlayer.getProgress();
-        int time = mPlayer.getDuration();
-        int max = SBMusicInfo.getMax();
-        int timeTemp = position / 1000;
-        String str = String.format("%02d:%02d", timeTemp / 60 % 60, timeTemp % 60);
-        txtTimeNow.setText(str);
-        SBMusicInfo.setProgress(max * position / time);
+        int currentTime = mPlayer.getProgress();
+        int maxTime = mPlayer.getDuration();
+        int max = musicProgress.getMax();
+        musicProgress.setProgress(max * currentTime / maxTime);
+        //更新进度条当前位置
+        currentTime = currentTime / 1000;
+        String str = String.format("%02d:%02d", currentTime / 60 % 60, currentTime % 60);
+        txtCurrentTime.setText(str);
     }
 
 

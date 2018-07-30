@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
             <Button
-                android:id="@+id/back_button"
+                android:id="@+id/btn_back"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_gravity="center_vertical"
@@ -25,7 +25,7 @@
         </FrameLayout>
 
         <com.example.a11084919.musicplayerdemo.controlsOverride.MarqueeTextView
-            android:id="@+id/txtMusicName"
+            android:id="@+id/txt_music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -47,7 +47,7 @@
         </FrameLayout>
     </LinearLayout>
     <com.example.a11084919.musicplayerdemo.controlsOverride.MarqueeTextView
-        android:id="@+id/txtMusic"
+        android:id="@+id/txt_music_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -85,7 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp">
         <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imgShow"
+        android:id="@+id/img_show"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/picture_default"
@@ -106,7 +106,7 @@
         android:gravity="center"
         android:orientation="vertical">
         <Button
-            android:id = "@+id/btnPlayWay"
+            android:id = "@+id/btn_play_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="单曲循环"/>
@@ -114,19 +114,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/txtTimeNow"
+                android:id="@+id/txt_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00"/>
 
             <SeekBar
-                android:id="@+id/SBMusicInfo"
+                android:id="@+id/music_progress"
                 android:max = "200"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <TextView
-                android:id="@+id/txtTimeMax"
+                android:id="@+id/txt_max_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00"/>
@@ -137,23 +137,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/btnPre"
+                android:id="@+id/btn_last"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="上一首"/>
             <Button
-                android:id="@+id/btnPlay"
+                android:id="@+id/btn_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:text="播放"/>
             <Button
-                android:id="@+id/btnPause"
+                android:id="@+id/btn_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="暂停"/>
             <Button
-                android:id="@+id/btnNext"
+                android:id="@+id/btn_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="下一首"/>

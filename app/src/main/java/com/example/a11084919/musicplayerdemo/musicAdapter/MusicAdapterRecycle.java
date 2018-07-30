@@ -21,6 +21,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.a11084919.musicplayerdemo.AlbumMusicListActivity;
 import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
@@ -44,24 +45,24 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout btnOk;
+        LinearLayout musicInfo;
         TextView txtMusicName;
         TextView txtMusicArtist;
         TextView txtTimeTotal;
         CheckBox ckChoose;
-        FrameLayout btnMusicDelete;
+        FrameLayout musicDelete;
         ImageView imgPlaying;
         //ImageView imgAlbum;
 
         public ViewHolder(View view) {
             super(view);
-            btnOk = view.findViewById(R.id.btnOk);
-            txtMusicName = view.findViewById(R.id.music_name);
-            txtMusicArtist = view.findViewById(R.id.music_artist);
+            musicInfo = view.findViewById(R.id.music_info);
+            txtMusicName = view.findViewById(R.id.txt_music_name);
+            txtMusicArtist = view.findViewById(R.id.txt_music_artist);
             txtTimeTotal = view.findViewById(R.id.txt_total_time);
-            btnMusicDelete = view.findViewById(R.id.btnMusicDelete);
-            ckChoose = view.findViewById(R.id.ckChoose);
-            imgPlaying = view.findViewById(R.id.imgPlaying);
+            musicDelete = view.findViewById(R.id.music_delete);
+            ckChoose = view.findViewById(R.id.ck_choose);
+            imgPlaying = view.findViewById(R.id.img_playing);
            // imgAlbum = view.findViewById(R.id.imgAlbum);
         }
     }
@@ -73,36 +74,47 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
     }
 
 
-    //private  ViewHolder[] tempHolder = new ViewHolder[2];
-    //此方法是资源文件musicList里有有多少就执行多少次？？？
+
+    //此方法是资源文件musicList里有有多少就执行多少次？？？NO
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.music_item, parent, false);
 
         final ViewHolder holder = new ViewHolder(view);
         //此纵向布局文件包括文本框控件和多选框控件
-        holder.btnOk.setOnClickListener(new View.OnClickListener() {
+        holder.musicInfo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
+                if(mMusicList == PublicObject.allMusicList){
+                    PublicObject.musicList = PublicObject.allMusicList;
+                    if (MusicListActivity.stateNow == MusicListActivity.STATE_PLAY_ENABLE) {
+                        int position = holder.getAdapterPosition();
+                        // Context context = v.getContext();
+                        Intent intent = new Intent();
+                        intent.putExtra("extra_position", String.valueOf(position));
+                        intent.setClass(mContext, PlayerActivity.class);
+                        mContext.startActivity(intent);
+                    } else {
+                        if (holder.ckChoose.isChecked()) {
+                            holder.ckChoose.setChecked(false);
+                        } else {
+                            holder.ckChoose.setChecked(true);
+                        }
+                    }
+                }else if(mMusicList == PublicObject.albumMusicList){
+                    PublicObject.musicList = PublicObject.albumMusicList;
                     int position = holder.getAdapterPosition();
-                    Context context = v.getContext();
+                    // Context context = v.getContext();
                     Intent intent = new Intent();
                     intent.putExtra("extra_position", String.valueOf(position));
-                    intent.setClass(context, PlayerActivity.class);
-                    context.startActivity(intent);
-                } else {
-                    if (holder.ckChoose.isChecked()) {
-                        holder.ckChoose.setChecked(false);
-                    } else {
-                        holder.ckChoose.setChecked(true);
-                    }
+                    intent.setClass(mContext, PlayerActivity.class);
+                    mContext.startActivity(intent);
                 }
+
             }
         });
 
 
-        holder.btnMusicDelete.setOnClickListener(new View.OnClickListener() {
+        holder.musicDelete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 showPopupMenu(v,position);
@@ -144,7 +156,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         if(PublicObject.indexFlag){
 //            if(position == PublicObject.musicIndexs[0]){
 //                holder.txtMusicName.setTextColor(Color.parseColor("#545454"));
-            if(position == PublicObject.musicIndexs[1]){
+            if(position == PublicObject.musicIndex[1]){
                 //holder.txtMusicName.setTextColor(Color.parseColor("#0000FF"));
                 holder.imgPlaying.setVisibility(View.VISIBLE);
             }else{
@@ -161,39 +173,15 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
         if (mEditMode == 0) {
             holder.ckChoose.setVisibility(View.GONE);
-            holder.btnMusicDelete.setVisibility(View.VISIBLE);
+            holder.musicDelete.setVisibility(View.VISIBLE);
         } else {
             holder.ckChoose.setVisibility(View.VISIBLE);
-            holder.btnMusicDelete.setVisibility(View.GONE);
+            holder.musicDelete.setVisibility(View.GONE);
         }
 
     }
 
-//    class LoadPicture extends AsyncTask<Music,Void,Bitmap>{
-//        private ImageView mImageView;
-//        private Music mMusic;
-//
-//        public LoadPicture(ImageView imageView){
-//            mImageView = imageView;
-//        }
-//
-//        @Override
-//        protected Bitmap doInBackground(Music... music) {
-//            mMusic = music[0];
-//            Bitmap bitmap = Functivity.getCover(mMusic.getPic());
-//            return bitmap;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Bitmap bitmap) {
-//            super.onPostExecute(bitmap);
-//            if(bitmap == null){
-//                mImageView.setImageResource(R.drawable.picture_default);
-//            }else{
-//                mImageView.setImageBitmap(bitmap);
-//            }
-//        }
-//    }
+
     //此处重写的函数返回值决定RecycleView中有多少行
     public int getItemCount() {
         return mMusicList.size();
@@ -227,6 +215,8 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                         //移除适配器中的内容即使notifyDataSetChanged刷新一下
                         Functivity.deleteFile(music.getPath());
                         DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
+
+                        Functivity.initAlbumList(mMusicList);
                         notifyDataSetChanged();
                         Toast.makeText(mContext,"歌曲" + music.getName() + "删除成功",Toast.LENGTH_SHORT).show();
                         break;

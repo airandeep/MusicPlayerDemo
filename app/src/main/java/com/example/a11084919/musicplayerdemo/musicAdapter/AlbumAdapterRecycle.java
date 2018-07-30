@@ -1,6 +1,7 @@
 package com.example.a11084919.musicplayerdemo.musicAdapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
@@ -8,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.a11084919.musicplayerdemo.AlbumMusicListActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
@@ -25,12 +28,14 @@ public class AlbumAdapterRecycle extends RecyclerView.Adapter<AlbumAdapterRecycl
     private Context mContext;
 
     static class ViewHolder extends RecyclerView.ViewHolder{
+        LinearLayout albumInfo;
         ImageView imgAlbumShow;
         TextView txtAlbumName;
         TextView txtMusicNum;
         TextView txtMusicArtist;
         public ViewHolder(View view){
             super(view);
+            albumInfo = view.findViewById(R.id.album_info);
             imgAlbumShow = view.findViewById(R.id.album_show);
             txtAlbumName = view.findViewById(R.id.album_name);
             txtMusicNum = view.findViewById(R.id.music_num);
@@ -48,6 +53,19 @@ public class AlbumAdapterRecycle extends RecyclerView.Adapter<AlbumAdapterRecycl
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item,parent,false);
         final ViewHolder holder = new ViewHolder(view);
+
+        holder.albumInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                Context context = view.getContext();
+                Intent intent = new Intent();
+                intent.putExtra("extra_album_name",mAlbumList.get(position));
+                intent.setClass(context, AlbumMusicListActivity.class);
+                context.startActivity(intent);
+            }
+        });
+
         return holder;
     }
 

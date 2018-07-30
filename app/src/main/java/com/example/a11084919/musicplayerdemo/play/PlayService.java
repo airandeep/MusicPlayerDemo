@@ -189,6 +189,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     public void startThread(){
         if(PublicObject.threadFlag){
             PublicObject.threadFlag = false;
+            //播放之后才允许在RecycleView中显示播放图标
             PublicObject.indexFlag = true;
             cycleFlag = true;
             new Thread(new Runnable() {
@@ -293,30 +294,15 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
     //服务中此方法用于列表循环
     public void onUpdateProgressBar(){
-        int position = mPlayer.getProgress();
-        int time = mPlayer.getDuration();
+        int currentTime = mPlayer.getProgress();
+        int maxTime = mPlayer.getDuration();
         int flag = mPlayer.getPlayMode();
         if(flag == Player.QUICKRANDLOOP){
-            time = time / 6;
+            maxTime = maxTime / 6;
         }
-        if(position > time-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
-//            if(flag == Player.LISTLOOP){
-//                mPlayer.playNext();
-//            }else if(flag == Player.SINGLELOOP){
-//                mPlayer.playCurrentSong();
-//            }else if(flag == Player.RANDLOOP){
-//                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
-//                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
-//            }else if(flag == Player.QUICKRANDLOOP){
-//                int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
-//                play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
-//            }else{
-//                mPlayer.playNext();
-//            }
+        if(currentTime > maxTime-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
             mPlayer.playNext();
         }
-
-        //showNotification();
     }
     //创建通知，使本服务为前台服务，从而不至于被系统回收
     private void showNotification() {

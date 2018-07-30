@@ -8,14 +8,14 @@
 
 
         <LinearLayout
-            android:id="@+id/btnOk"
+            android:id="@+id/music_info"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:background="@drawable/recycler_item_selector"
             android:gravity="center_vertical">
             <CheckBox
-                android:id="@+id/ckChoose"
+                android:id="@+id/ck_choose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
@@ -38,13 +38,13 @@
                     android:layout_height="wrap_content"
                     android:gravity="center">
                     <ImageView
-                        android:id="@+id/imgPlaying"
+                        android:id="@+id/img_playing"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/playing1"
                         android:visibility="gone"/>
                     <TextView
-                        android:id="@+id/music_name"
+                        android:id="@+id/txt_music_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical">
                     <TextView
-                        android:id="@+id/music_artist"
+                        android:id="@+id/txt_music_artist"
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
         </LinearLayout>
 
         <FrameLayout
-            android:id="@+id/btnMusicDelete"
+            android:id="@+id/music_delete"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingRight="8dp"
@@ -86,7 +86,6 @@
             android:background="@drawable/recycler_item_selector">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/image_button_action"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"

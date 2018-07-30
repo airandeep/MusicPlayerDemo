@@ -5,7 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 
+import com.example.a11084919.musicplayerdemo.model.Music;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Functivity {
     public static boolean deleteFile(String filePath){
@@ -39,6 +43,27 @@ public class Functivity {
     public static boolean isExists(String path) {
         File file = new File(path);
         return file.exists();
+    }
+
+    public static void initAlbumList(final List<Music> musicListPara){
+        if(PublicObject.albumList != null){
+            PublicObject.albumList.clear();
+            PublicObject.musicMap.clear();
+        }
+        int n = musicListPara.size();
+        for(int i = 0;i < n;i++){
+            String key = musicListPara.get(i).getAlbum();
+            List<Music> value;
+            if(PublicObject.musicMap.containsKey(key)){
+                PublicObject.musicMap.get(key).add(musicListPara.get(i));
+            }else{
+                PublicObject.albumList.add(key);
+
+                value = new ArrayList<>();
+                value.add(musicListPara.get(i));
+                PublicObject.musicMap.put(key,value);
+            }
+        }
     }
 
 

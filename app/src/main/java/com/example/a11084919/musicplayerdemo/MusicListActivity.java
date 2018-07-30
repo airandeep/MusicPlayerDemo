@@ -16,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -113,7 +114,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
         initView();
 
-
+        PublicObject.musicList = PublicObject.allMusicList;
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
@@ -123,20 +124,34 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         }
 
         //将nav_call设置为默认选中
-        if(adapterNow == ADAPTER_ALBUM){
-            navigationView.setCheckedItem(R.id.nav_album_list);
-            bottomNav.setVisibility(View.GONE);
-        }else{
-            navigationView.setCheckedItem(R.id.nav_play_list);
-            bottomNav.setVisibility(View.VISIBLE);
+        switch (adapterNow){
+            case ADAPTER_MUSIC:{
+                navigationView.setCheckedItem(R.id.nav_play_list);
+                bottomNav.setVisibility(View.VISIBLE);
+                actionBar.setTitle("播放列表");
+                break;
+            }
+            case ADAPTER_ALBUM:{
+                navigationView.setCheckedItem(R.id.nav_album_list);
+                bottomNav.setVisibility(View.GONE);
+                actionBar.setTitle("专辑列表");
+                break;
+            }
         }
-
 
         setupDrawerContent(navigationView);
         //将本活动与服务绑定
         bindPlayService();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        //GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+//        if(adapterNow == ADAPTER_ALBUM){
+//            recyclerView.setLayoutManager(gridLayoutManager);
+//        }else{
+            recyclerView.setLayoutManager(linearLayoutManager);
+ //       }
+
+
+
         recyclerView.setNestedScrollingEnabled(false);
 
         //异步实例化适配器
@@ -157,16 +172,16 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
         btnChooseAll.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                int n = PublicObject.musicList.size();
+                int n = PublicObject.allMusicList.size();
                 String flag = btnChooseAll.getText().toString();
                 if(flag.equals("全选")){
                     for(int i = 0;i < n;i++){
-                        PublicObject.musicList.get(i).setSelect(true);
+                        PublicObject.allMusicList.get(i).setSelect(true);
                     }
                     btnChooseAll.setText("全不选");
                 }else{
                     for(int i = 0;i < n;i++){
-                        PublicObject.musicList.get(i).setSelect(false);
+                        PublicObject.allMusicList.get(i).setSelect(false);
                     }
                     btnChooseAll.setText("全选");
                 }
@@ -217,6 +232,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                                     DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
                                 }
                             }
+                            Functivity.initAlbumList(PublicObject.musicList);
                             musicAdapterRecycle.notifyDataSetChanged();
 
                             dialog.dismiss();
@@ -284,7 +300,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
     private void initView(){
         drawerLayout = findViewById(R.id.drawer_layout);
-        recyclerView = findViewById(R.id.musicRecycleView);
+        recyclerView = findViewById(R.id.music_list);
         //btnManage = findViewById(R.id.btnManage);
         LinOutButton = findViewById(R.id.LinOutButton);
         btnChooseAll = findViewById(R.id.btnChooseAll);
@@ -323,13 +339,19 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                                     recyclerView.setAdapter(musicAdapterRecycle);
                                     bottomNav.setVisibility(View.VISIBLE);
                                     actionBar.setTitle("播放列表");
+                                    if(stateNow == STATE_MANAGE){
+                                        bottomNav.setVisibility(View.GONE);
+                                        LinOutButton.setVisibility(View.VISIBLE);
+                                    }
                                 }
                             }, 300);
+
                         }
                         break;
                     }
                     case R.id.nav_album_list:{
                         if(adapterNow != ADAPTER_ALBUM){
+
                             navDrawerRunnable.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -337,6 +359,9 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                                     recyclerView.setAdapter(albumAdapterRecycle);
                                     bottomNav.setVisibility(View.GONE);
                                     actionBar.setTitle("专辑列表");
+                                    if(stateNow == STATE_MANAGE){
+                                        LinOutButton.setVisibility(View.GONE);
+                                    }
                                 }
                             }, 300);
 
@@ -431,7 +456,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         AudioManager audioManager  = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         switch (keyCode){
             case KeyEvent.KEYCODE_BACK:
-                if(stateNow == STATE_MANAGE){
+                if(stateNow == STATE_MANAGE && adapterNow == ADAPTER_MUSIC){
                     bottomNav.setVisibility(View.VISIBLE);
                     //btnManage.setVisibility(View.VISIBLE);
                     LinOutButton.setVisibility(View.GONE);
@@ -439,6 +464,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                     stateNow = STATE_PLAY_ENABLE;
 
                 }else{
+                    stateNow = STATE_PLAY_ENABLE;
                     ActivityCollector.finishAll();
                 }
                 break;
@@ -487,8 +513,8 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         }
 
         if(adapterNow == ADAPTER_MUSIC){
-            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
-            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndex[0]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndex[1]);
         }
 
     }
@@ -513,8 +539,8 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         }
 
         if(adapterNow == ADAPTER_MUSIC){
-            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
-            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndex[0]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndex[1]);
         }
 
     }
@@ -540,8 +566,8 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 imgNavHeadShow.setImageBitmap(bmpMp3);
                 imgShow.setImageBitmap(bmpMp3);
             }
-            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[0]);
-            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndexs[1]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndex[0]);
+            musicAdapterRecycle.notifyItemChanged(PublicObject.musicIndex[1]);
         }
 
 

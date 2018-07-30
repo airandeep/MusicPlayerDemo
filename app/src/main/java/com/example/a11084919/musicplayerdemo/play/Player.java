@@ -79,17 +79,27 @@ public class Player implements IPlay {
             setCurrentMusic(PublicObject.musicList.get(position));
             this.position = position;
 
-            PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
-            PublicObject.musicIndexs[1] = position;
+            if(PublicObject.musicList == PublicObject.allMusicList){
+                PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
+                PublicObject.musicIndex[1] = position;
+            }else if(PublicObject.musicList == PublicObject.albumMusicList){
+                PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
+                int n = PublicObject.allMusicList.size();
+                for(int i = 0;i < n;i++){
+                    if(getCurrentMusic().getTitle().equals(PublicObject.allMusicList.get(i).getTitle())){
+                        PublicObject.musicIndex[1] = i;
+                        break;
+                    }
+                }
+            }
 
+            notifyPlayStatusChanged();
             try {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();
                 mediaPlayer.start();
-                notifyPlayStatusChanged();
             } catch (IOException e) {
-                notifyPlayStatusChanged();
                 return false;
             }
             return true;
@@ -165,8 +175,19 @@ public class Player implements IPlay {
             position--;
 
             setCurrentMusic(PublicObject.musicList.get(position));
-            PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
-            PublicObject.musicIndexs[1] = position;
+            if(PublicObject.musicList == PublicObject.allMusicList){
+                PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
+                PublicObject.musicIndex[1] = position;
+            }else if(PublicObject.musicList == PublicObject.albumMusicList){
+                PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
+                int n = PublicObject.allMusicList.size();
+                for(int i = 0;i < n;i++){
+                    if(getCurrentMusic().getTitle().equals(PublicObject.allMusicList.get(i).getTitle())){
+                        PublicObject.musicIndex[1] = i;
+                        break;
+                    }
+                }
+            }
             try {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
@@ -199,8 +220,20 @@ public class Player implements IPlay {
             position++;
 
             setCurrentMusic(PublicObject.musicList.get(position));
-            PublicObject.musicIndexs[0] = PublicObject.musicIndexs[1];
-            PublicObject.musicIndexs[1] = position;
+            if(PublicObject.musicList == PublicObject.allMusicList){
+                PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
+                PublicObject.musicIndex[1] = position;
+            }else if(PublicObject.musicList == PublicObject.albumMusicList){
+                PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
+                int n = PublicObject.allMusicList.size();
+                for(int i = 0;i < n;i++){
+                    if(getCurrentMusic().getTitle().equals(PublicObject.allMusicList.get(i).getTitle())){
+                        PublicObject.musicIndex[1] = i;
+                        break;
+                    }
+                }
+            }
+
             try {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
@@ -227,7 +260,6 @@ public class Player implements IPlay {
 
     @Override
     public void releasePlayer() {
-
         mediaPlayer.reset();
         mediaPlayer.release();
         mediaPlayer = null;
@@ -235,7 +267,7 @@ public class Player implements IPlay {
     }
 
     private void notifyPlayStatusChanged() {
-        for (Callback callback : mCallbacks) {
+        for(Callback callback : mCallbacks){
             callback.onPlayStatusChanged();
         }
     }
