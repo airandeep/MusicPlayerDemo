@@ -35,29 +35,29 @@ import java.util.List;
 public class ScanningActivity extends BaseActivity {
 
     private static String TAG = "ScanningActivity";
-    //private boolean cycleFlag;
     private String strShow;
 
-    private Button btnLocalMusic;
-    private TextView scan_result_txt;
-    private TextView txtScanning;
-    private ImageView imgScan;
     private Button btnBack;
-    private ProgressBar pbScanning;
+    private ImageView imgScan;
+    private ProgressBar progressScanning;
+    private TextView txtScanning;
+    private TextView txtScanResult;
+    private Button btnLocalMusic;
 
     private MediaMetadataRetriever mmr;
-
     private List<Music> tempMusicList;
 
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
             switch (msg.what){
+                //扫描刚开始
                 case 0:
-                    scan_result_txt.setText(strShow);
+                    txtScanResult.setText(strShow);
                     break;
+                    //扫描结束
                 case 1:
                     imgScan.setVisibility(View.VISIBLE);
-                    pbScanning.setVisibility(View.GONE);
+                    progressScanning.setVisibility(View.GONE);
 
                     imgScan.setImageResource(R.drawable.local_scan_ok);
                     txtScanning.setText("已扫描"+ PublicObject.allMusicList.size() + "首歌曲");
@@ -87,32 +87,22 @@ public class ScanningActivity extends BaseActivity {
         String flag = intentJus.getStringExtra("extra_flag");
 
         //判断是不是由播放列表活动点击过来的
+        //flag等于null说明正常点进来需要判断数据库中是否存有相关数据决定是否扫描
         if(flag == null){
-            if(PublicObject.allMusicList != null){
+            if(PublicObject.allMusicList != null){//如果静态变量allMusicList不为null说明albumList与musicMap 也为null
                 Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                 startActivity(intent);
                 finish();
                 return;
             }else{
                 tempMusicList = DataSupport.findAll(Music.class);
-
                 //存储专辑静态变量
                 if(tempMusicList.size()>0){
                     PublicObject.allMusicList = tempMusicList;
-//                    int n = tempMusicList.size();
-//                    for(int i = 0;i < n;i++){
-//                        String key = tempMusicList.get(i).getAlbum();
-//                        List<Music> value;
-//                        if(PublicObject.musicMap.containsKey(key)){
-//                            PublicObject.musicMap.get(key).add(tempMusicList.get(i));
-//                        }else{
-//                            PublicObject.albumList.add(key);
-//                            value = new ArrayList<>();
-//                            value.add(tempMusicList.get(i));
-//                            PublicObject.musicMap.put(key,value);
-//                        }
-//                    }
-                    Functivity.initAlbumList(tempMusicList);
+                    //将Player中的集合list引用赋值，防止语音直接播放报错
+                    PublicObject.musicList = tempMusicList;
+                    Functivity.initAlbumListAndMusicMap(tempMusicList);
+
                     Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                     startActivity(intent);
                     finish();
@@ -141,9 +131,8 @@ public class ScanningActivity extends BaseActivity {
                     }else{
                         btnLocalMusic.setVisibility(View.GONE);
                         txtScanning.setVisibility(View.VISIBLE);
-
                         imgScan.setVisibility(View.GONE);
-                        pbScanning.setVisibility(View.VISIBLE);
+                        progressScanning.setVisibility(View.VISIBLE);
 
                         new Thread(new Runnable() {
                             @Override
@@ -151,14 +140,10 @@ public class ScanningActivity extends BaseActivity {
 //                                File path = Environment.getExternalStorageDirectory();// 获得SD卡路径
 //                                final File[] files = path.listFiles();// 读取
 //                                getFileMusic(files);
-
                                 getMusicFileByMediaStore();
-                                if(PublicObject.allMusicList != null){
-                                    PublicObject.allMusicList.clear();
-                                }
-                                PublicObject.allMusicList = tempMusicList;
-                                Functivity.initAlbumList(tempMusicList);
-
+                                PublicObject.allMusicList = tempMusicList;//静态引用指向另一个集合时，之前指向的集合如果没有引用指向时会自动被系统回收
+                                PublicObject.musicList = tempMusicList;
+                                Functivity.initAlbumListAndMusicMap(tempMusicList);
                                 mHandler.sendEmptyMessage(1);
                             }
                         }).start();
@@ -179,12 +164,12 @@ public class ScanningActivity extends BaseActivity {
     }
 
     private void initView(){
-        scan_result_txt = findViewById(R.id.scan_result_txt);
-        btnLocalMusic = findViewById(R.id.btnLocalMusic);
-        txtScanning = findViewById(R.id.txtScanning);
-        imgScan = findViewById(R.id.scan_icon);
-        btnBack = findViewById(R.id.back_button);
-        pbScanning = findViewById(R.id.pbScanning);
+        btnBack = findViewById(R.id.btn_back);
+        imgScan = findViewById(R.id.img_scan);
+        progressScanning = findViewById(R.id.progress_scanning);
+        txtScanning = findViewById(R.id.txt_scanning);
+        txtScanResult = findViewById(R.id.txt_scan_result);
+        btnLocalMusic = findViewById(R.id.btn_local_music);
     }
 
     private void getMusicFileByMediaStore()
@@ -299,22 +284,15 @@ public class ScanningActivity extends BaseActivity {
                     txtScanning.setVisibility(View.VISIBLE);
 
                     imgScan.setVisibility(View.GONE);
-                    pbScanning.setVisibility(View.VISIBLE);
+                    progressScanning.setVisibility(View.VISIBLE);
 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-//                            File path = Environment.getExternalStorageDirectory();// 获得SD卡路径
-//                            final File[] files = path.listFiles();// 读取
-//                            getFileMusic(files);
-
                             getMusicFileByMediaStore();
-                            if(PublicObject.allMusicList != null){
-                                PublicObject.allMusicList.clear();
-                            }
                             PublicObject.allMusicList = tempMusicList;
-                            Functivity.initAlbumList(tempMusicList);
-
+                            PublicObject.musicList = tempMusicList;
+                            Functivity.initAlbumListAndMusicMap(tempMusicList);
                             mHandler.sendEmptyMessage(1);
                         }
                     }).start();

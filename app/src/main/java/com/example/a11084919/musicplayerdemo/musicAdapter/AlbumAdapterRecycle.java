@@ -19,8 +19,6 @@ import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class AlbumAdapterRecycle extends RecyclerView.Adapter<AlbumAdapterRecycle.ViewHolder>{
 
@@ -51,7 +49,7 @@ public class AlbumAdapterRecycle extends RecyclerView.Adapter<AlbumAdapterRecycl
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item_grid,parent,false);
         final ViewHolder holder = new ViewHolder(view);
 
         holder.albumInfo.setOnClickListener(new View.OnClickListener() {

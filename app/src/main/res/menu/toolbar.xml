@@ -12,9 +12,9 @@
         android:title="Settings"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/delete"
-        android:icon="@drawable/ic_delete"
-        android:title="Delete"
+        android:id="@+id/voice_recognition"
+        android:title="语音识别"
         app:showAsAction="never"/>
+
 
 </menu>

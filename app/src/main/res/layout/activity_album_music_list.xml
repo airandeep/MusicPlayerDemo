@@ -91,10 +91,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"></android.support.v7.widget.RecyclerView>
     <!--<FrameLayout-->
-        <!--android:id="@+id/bottom_nav"-->
+        <!--android:id="@+id/bottom_view"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content">-->
-        <!--<include layout="@layout/bottom_nav"/>-->
+        <!--<include layout="@layout/bottom_view"/>-->
     <!--</FrameLayout>-->
 
 </LinearLayout>

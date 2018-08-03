@@ -228,16 +228,16 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             public void onClick(View view) {
                 String flag = btnPlayMode.getText().toString();
                 if(flag.equals("列表循环")){
-                    mPlayer.setPlayMode(Player.SINGLELOOP);
+                    mPlayer.setPlayMode(Player.SINGLE_LOOP);
                     btnPlayMode.setText("单曲循环");
                 }else if(flag.equals("单曲循环")){
-                    mPlayer.setPlayMode(Player.RANDLOOP);
+                    mPlayer.setPlayMode(Player.RAND_LOOP);
                     btnPlayMode.setText("随机循环");
                 }else if(flag.equals("随机循环")){
-                    mPlayer.setPlayMode(Player.QUICKRANDLOOP);
+                    mPlayer.setPlayMode(Player.QUICK_RAND_LOOP);
                     btnPlayMode.setText("快速随机");
                 }else if(flag.equals("快速随机")){
-                    mPlayer.setPlayMode(Player.LISTLOOP);
+                    mPlayer.setPlayMode(Player.LIST_LOOP);
                     btnPlayMode.setText("列表循环");
                 }
 
@@ -392,13 +392,13 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         mPlayer.startThread();
 
         int flag = mPlayer.getPlayMode();
-        if(flag == Player.LISTLOOP){
+        if(flag == Player.LIST_LOOP){
             btnPlayMode.setText("列表循环");
-        }else if(flag == Player.SINGLELOOP){
+        }else if(flag == Player.SINGLE_LOOP){
             btnPlayMode.setText("单曲循环");
-        }else if(flag == Player.RANDLOOP){
+        }else if(flag == Player.RAND_LOOP){
             btnPlayMode.setText("随机循环");
-        }else if(flag == Player.QUICKRANDLOOP){
+        }else if(flag == Player.QUICK_RAND_LOOP){
             btnPlayMode.setText("快速随机");
         }else{
             btnPlayMode.setText("列表循环");
@@ -428,7 +428,8 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
                 btnPause.setVisibility(View.GONE);
                 btnPlay.setVisibility(View.VISIBLE);
             }
-        }else{
+        }
+        else{
             notiFlag = false;
             position =Integer.parseInt(strPosition) ;
 

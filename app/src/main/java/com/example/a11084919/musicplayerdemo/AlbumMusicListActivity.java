@@ -37,7 +37,7 @@ public class AlbumMusicListActivity extends BaseActivity {
         initView();
         MusicListActivity.stateNow = MusicListActivity.STATE_PLAY_ENABLE;
         //初期处理
-        PublicObject.musicIndex[0] = PublicObject.musicIndex[1] = -1;
+        //PublicObject.musicIndex[0] = PublicObject.musicIndex[1] = -1;
         Intent intent = getIntent();
         String strAlbumName = intent.getStringExtra("extra_album_name");
         PublicObject.albumMusicList = PublicObject.musicMap.get(strAlbumName);

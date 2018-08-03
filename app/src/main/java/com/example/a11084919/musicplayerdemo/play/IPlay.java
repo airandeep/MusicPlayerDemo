@@ -8,9 +8,9 @@ public interface IPlay {
 
     boolean play(int position,String musicPath,boolean notiFlag);
 
-    void release();
-
     boolean playCurrentSong();
+
+    void release();
     //获取当前歌曲在歌曲列表中位置
     int getPosition();
 
@@ -19,7 +19,6 @@ public interface IPlay {
     void setPlayMode(int playMode);
 
     Music getCurrentMusic();
-
 
     void registerCallback(Callback callback);
 

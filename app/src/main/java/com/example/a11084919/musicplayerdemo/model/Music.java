@@ -23,14 +23,18 @@ public class Music extends DataSupport{
     private byte[] pic;
     //音频时长
     private int duration;
+    public Music(){}
+    public Music(FavoriteMusic favoriteMusic){
+        this.isSelect = favoriteMusic.isSelect();
+        this.path = favoriteMusic.getPath();
+        this.name = favoriteMusic.getName();
+        this.artist = favoriteMusic.getArtist();
+        this.title = favoriteMusic.getTitle();
+        this.album = favoriteMusic.getAlbum();
+        this.pic = favoriteMusic.getPic();
+        this.duration = favoriteMusic.getDuration();
+    }
 
-
-    //private boolean isPlaying;
-
-//    public Music(String name,String path){
-//        this.name = name;
-//        this.path = path;
-//    }
     public boolean isSelect() {
         return isSelect;
     }
@@ -93,12 +97,4 @@ public class Music extends DataSupport{
         this.duration = duration;
     }
 
-    //
-//    public boolean isPlaying() {
-//        return isPlaying;
-//    }
-//
-//    public void setPlaying(boolean playing) {
-//        isPlaying = playing;
-//    }
 }

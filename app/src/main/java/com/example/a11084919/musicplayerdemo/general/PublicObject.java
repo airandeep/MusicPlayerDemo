@@ -1,5 +1,6 @@
 package com.example.a11084919.musicplayerdemo.general;
 
+import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ public class PublicObject {
     public static List<Music> musicList;
 
     public static List<Music> allMusicList;
+    //某个专辑下的歌曲
     public static List<Music> albumMusicList;
+    public static List<FavoriteMusic> favoriteMusicList;
 
     public static List<String> albumList = new ArrayList<>();
     public static Map<String,List<Music>> musicMap = new HashMap<>();

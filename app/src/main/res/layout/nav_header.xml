@@ -4,21 +4,26 @@
     android:layout_height="300dp"
     android:background="?attr/colorPrimary">
     <ImageView
-        android:id="@+id/nav_head_show"
+        android:id="@+id/nav_img_head_show"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/picture_default"/>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/airan_launch"
+        android:layout_centerInParent="true"/>
     <TextView
-        android:id="@+id/nav_head_play_info"
+        android:id="@+id/nav_txt_head_play_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/nav_head_play_singer"
+        android:layout_above="@id/nav_txt_head_play_singer"
         android:text="菊花台"
         android:textColor="#FFF"
         android:textSize="18sp"
         android:singleLine="true"/>
     <TextView
-        android:id="@+id/nav_head_play_singer"
+        android:id="@+id/nav_txt_head_play_singer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

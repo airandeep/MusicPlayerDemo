@@ -27,6 +27,7 @@ import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
+import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;
 import com.example.a11084919.musicplayerdemo.play.PlayService;
 
@@ -69,8 +70,8 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 
     //像适配器中传入数据集合
     public MusicAdapterRecycle(Context context, List<Music> musicList) {
-        mMusicList = musicList;
         mContext = context;
+        mMusicList = musicList;
     }
 
 
@@ -152,18 +153,20 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
 //        //异步加载图片
 //        LoadPicture task = new LoadPicture(holder.imgAlbum);
 //        task.execute(music);
-
-        if(PublicObject.indexFlag){
+        if(mMusicList == PublicObject.allMusicList){//播放列表才刷新
+            if(PublicObject.indexFlag){
 //            if(position == PublicObject.musicIndexs[0]){
 //                holder.txtMusicName.setTextColor(Color.parseColor("#545454"));
-            if(position == PublicObject.musicIndex[1]){
-                //holder.txtMusicName.setTextColor(Color.parseColor("#0000FF"));
-                holder.imgPlaying.setVisibility(View.VISIBLE);
-            }else{
-                //holder.txtMusicName.setTextColor(Color.parseColor("#545454"));
-                holder.imgPlaying.setVisibility(View.GONE);
+                if(position == PublicObject.musicIndex[1]){
+                    //holder.txtMusicName.setTextColor(Color.parseColor("#0000FF"));
+                    holder.imgPlaying.setVisibility(View.VISIBLE);
+                }else{
+                    //holder.txtMusicName.setTextColor(Color.parseColor("#545454"));
+                    holder.imgPlaying.setVisibility(View.GONE);
+                }
             }
         }
+
 
         if (mMusicList.get(position).isSelect()) {
             holder.ckChoose.setChecked(true);
@@ -210,16 +213,32 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.delete_item:{
-                        Music music = mMusicList.get(position);
-                        mMusicList.remove(position);
-                        //移除适配器中的内容即使notifyDataSetChanged刷新一下
-                        Functivity.deleteFile(music.getPath());
-                        DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
+                        if(mMusicList == PublicObject.allMusicList){
+                            Music music = mMusicList.get(position);
+                            mMusicList.remove(position);
+                            //移除适配器中的内容即使notifyDataSetChanged刷新一下
+                            Functivity.deleteFile(music.getPath());
+                            DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
 
-                        Functivity.initAlbumList(mMusicList);
-                        notifyDataSetChanged();
-                        Toast.makeText(mContext,"歌曲" + music.getName() + "删除成功",Toast.LENGTH_SHORT).show();
+                            Functivity.initAlbumListAndMusicMap(mMusicList);
+                            notifyDataSetChanged();
+                            Toast.makeText(mContext,"歌曲" + music.getName() + "删除成功",Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(mContext,"当前专辑删除功能未做",Toast.LENGTH_SHORT).show();
+                        }
                         break;
+                    }
+                    case R.id.add_item:{
+                        Music music = mMusicList.get(position);
+                        List<FavoriteMusic> musics = DataSupport.where("path = ?",music.getPath()).find(FavoriteMusic.class);
+                        if(musics.size()>0){
+                            Toast.makeText(mContext,"当前喜爱歌曲已存在",Toast.LENGTH_SHORT).show();
+                        }else{
+                            FavoriteMusic favoriteMusic = new FavoriteMusic(music);
+                            favoriteMusic.save();
+                            Toast.makeText(mContext,"当前喜爱歌曲已添加",Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                     default:{
                         break;

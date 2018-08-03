@@ -21,12 +21,10 @@ import android.widget.RemoteViews;
 
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.asrBaidu.MiniWakeUp;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
-import static android.app.Notification.VISIBILITY_PUBLIC;
 import static java.lang.Thread.sleep;
 
 
@@ -64,9 +62,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         public void handleMessage(Message msg){
             switch (msg.what){
                 case 0:
-                    //if(mPlayer.isPlaying()){
-                        mPlayer.updateProgressBar();
-//                    }
+                    mPlayer.updateProgressBar();
                     break;
                 default:
                     break;
@@ -192,17 +188,14 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
             //播放之后才允许在RecycleView中显示播放图标
             PublicObject.indexFlag = true;
             cycleFlag = true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (cycleFlag){
-                        try{
-                            sleep(milliseconds);
-                        }catch (InterruptedException e){
-                            e.printStackTrace();
-                        }
-                        mHandler.sendEmptyMessage(0);
+            new Thread(()->{
+                while (cycleFlag){
+                    try{
+                        sleep(milliseconds);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
                     }
+                    mHandler.sendEmptyMessage(0);
                 }
             }).start();
         }
@@ -212,12 +205,12 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         return mPlayer.play(position,musicPath,notiFlag);
     }
 
-    public void release(){
-        mPlayer.release();
-    }
-
     public boolean playCurrentSong(){
         return mPlayer.playCurrentSong();
+    }
+
+    public void release(){
+        mPlayer.release();
     }
 
     public int getPosition() {
@@ -297,7 +290,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
         int currentTime = mPlayer.getProgress();
         int maxTime = mPlayer.getDuration();
         int flag = mPlayer.getPlayMode();
-        if(flag == Player.QUICKRANDLOOP){
+        if(flag == Player.QUICK_RAND_LOOP){
             maxTime = maxTime / 6;
         }
         if(currentTime > maxTime-1000){//不要用等于，因为子线程是每隔0.1秒执行一次，有可能跳过相等的时候
@@ -328,10 +321,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     }
 
 
-    private RemoteViews getTestContentView(){
-        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.remote_view_test);
-        return remoteViews;
-    }
 
     //通知栏绑定UI
     private RemoteViews getContentView() {
@@ -368,7 +357,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private void updateRemoteViews(RemoteViews remoteView) {
         remoteView.setImageViewResource(R.id.image_view_play_toggle, isPlaying()
                 ? R.drawable.ic_remote_view_pause : R.drawable.ic_remote_view_play);
-        //String tempPath = mPlayer.getCurrentMusic().getPath();
         Bitmap bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             remoteView.setImageViewResource(R.id.image_view_album,R.drawable.picture_default);

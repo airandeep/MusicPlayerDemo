@@ -61,8 +61,11 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".AlbumMusicListActivity"
-            android:screenOrientation="portrait" ></activity>
+        <activity
+            android:name=".AlbumMusicListActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".VoiceRecognitionActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

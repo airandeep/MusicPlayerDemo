@@ -1,9 +1,11 @@
 package com.example.a11084919.musicplayerdemo.general;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.net.ConnectivityManager;
 
 import com.example.a11084919.musicplayerdemo.model.Music;
 
@@ -45,7 +47,7 @@ public class Functivity {
         return file.exists();
     }
 
-    public static void initAlbumList(final List<Music> musicListPara){
+    public static void initAlbumListAndMusicMap(final List<Music> musicListPara){
         if(PublicObject.albumList != null){
             PublicObject.albumList.clear();
             PublicObject.musicMap.clear();
@@ -64,6 +66,21 @@ public class Functivity {
                 PublicObject.musicMap.put(key,value);
             }
         }
+    }
+
+    /**
+     * 检测网络是否连接
+     * @return
+     */
+    public static boolean checkNetworkState(Context context) {
+        boolean flag = false;
+        //得到网络连接信息
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        //去进行判断网络是否连接
+        if (manager.getActiveNetworkInfo() != null) {
+            flag = manager.getActiveNetworkInfo().isAvailable();
+        }
+        return flag;
     }
 
 

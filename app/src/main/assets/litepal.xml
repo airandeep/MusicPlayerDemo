@@ -3,10 +3,11 @@
 
     <dbname value="MusicStore" />
 
-    <version value="2" />
+    <version value="3" />
 
     <list>
         <mapping class="com.example.a11084919.musicplayerdemo.model.Music" />
+        <mapping class="com.example.a11084919.musicplayerdemo.model.FavoriteMusic"/>
     </list>
 
 </litepal>

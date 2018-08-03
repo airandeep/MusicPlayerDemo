@@ -12,10 +12,10 @@ import java.util.List;
 
 public class Player implements IPlay {
 
-    public static final int LISTLOOP = 0;
-    public static final int SINGLELOOP = 1;
-    public static final int RANDLOOP = 2;
-    public static final int QUICKRANDLOOP = 3;
+    public static final int LIST_LOOP = 0;
+    public static final int SINGLE_LOOP = 1;
+    public static final int RAND_LOOP = 2;
+    public static final int QUICK_RAND_LOOP = 3;
 
     private static volatile Player sInstance;
     private MediaPlayer mediaPlayer;
@@ -25,23 +25,6 @@ public class Player implements IPlay {
     //播放模式
     private int playMode;
 
-    public int getPlayMode() {
-        return playMode;
-    }
-
-    public void setPlayMode(int playMode) {
-        this.playMode = playMode;
-    }
-
-
-    private Music currentMusic;
-
-    public Music getCurrentMusic() {
-        return currentMusic;
-    }
-    public void setCurrentMusic(Music currentMusic) {
-        this.currentMusic = currentMusic;
-    }
 
     //因为PlayService也继承了此接口mCallbacks，所以可以将服务实例化对象存在此集合mCallbacks中
     //然后在使用
@@ -49,13 +32,7 @@ public class Player implements IPlay {
 
     private Player(){
         mediaPlayer = new MediaPlayer();//media刚创建时处于Idle状态
-        //mediaPlayer.setLooping(true);
     }
-
-    public int getPosition() {
-        return position;
-    }
-
 
     public static Player getInstance(){
         if(sInstance == null){
@@ -67,6 +44,7 @@ public class Player implements IPlay {
         }
         return sInstance;
     }
+
 
     public void startThread(){}
 
@@ -82,7 +60,7 @@ public class Player implements IPlay {
             if(PublicObject.musicList == PublicObject.allMusicList){
                 PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
                 PublicObject.musicIndex[1] = position;
-            }else if(PublicObject.musicList == PublicObject.albumMusicList){
+            }else{
                 PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
                 int n = PublicObject.allMusicList.size();
                 for(int i = 0;i < n;i++){
@@ -92,25 +70,18 @@ public class Player implements IPlay {
                     }
                 }
             }
-
-            notifyPlayStatusChanged();
             try {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(getCurrentMusic().getPath());
                 mediaPlayer.prepare();
                 mediaPlayer.start();
+                notifyPlayStatusChanged();
             } catch (IOException e) {
                 return false;
             }
             return true;
         }
 
-    }
-
-    public void release(){
-        if(mediaPlayer != null){
-            mediaPlayer.release();
-        }
     }
 
     public boolean playCurrentSong(){
@@ -124,6 +95,33 @@ public class Player implements IPlay {
             return false;
         }
         return true;
+    }
+
+    public void release(){
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+        }
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getPlayMode() {
+        return playMode;
+    }
+
+    public void setPlayMode(int playMode) {
+        this.playMode = playMode;
+    }
+
+
+    private Music currentMusic;
+    public Music getCurrentMusic() {
+        return currentMusic;
+    }
+    public void setCurrentMusic(Music currentMusic) {
+        this.currentMusic = currentMusic;
     }
 
     public void registerCallback(Callback callback){
@@ -166,7 +164,7 @@ public class Player implements IPlay {
 
     public boolean playLast(){
         int flag = getPlayMode();
-        if(flag == Player.LISTLOOP){
+        if(flag == Player.LIST_LOOP){
 
             //解决删除问题
             if(position == 0 ||position == -1 || position >= PublicObject.musicList.size()){
@@ -178,7 +176,7 @@ public class Player implements IPlay {
             if(PublicObject.musicList == PublicObject.allMusicList){
                 PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
                 PublicObject.musicIndex[1] = position;
-            }else if(PublicObject.musicList == PublicObject.albumMusicList){
+            }else {
                 PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
                 int n = PublicObject.allMusicList.size();
                 for(int i = 0;i < n;i++){
@@ -198,9 +196,9 @@ public class Player implements IPlay {
                 return false;
             }
             return true;
-        }else if(flag == Player.SINGLELOOP){
+        }else if(flag == Player.SINGLE_LOOP){
             playCurrentSong();
-        }else if(flag == Player.RANDLOOP || flag == Player.QUICKRANDLOOP){
+        }else if(flag == Player.RAND_LOOP || flag == Player.QUICK_RAND_LOOP){
 
             int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
             play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
@@ -212,7 +210,7 @@ public class Player implements IPlay {
     public boolean playNext(){
         int flag = getPlayMode();
 
-        if(flag == Player.LISTLOOP){
+        if(flag == Player.LIST_LOOP){
             //解决删除问题
             if(position >= PublicObject.musicList.size()-1){
                 position = -1;
@@ -223,7 +221,7 @@ public class Player implements IPlay {
             if(PublicObject.musicList == PublicObject.allMusicList){
                 PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
                 PublicObject.musicIndex[1] = position;
-            }else if(PublicObject.musicList == PublicObject.albumMusicList){
+            }else {
                 PublicObject.musicIndex[0] = PublicObject.musicIndex[1];
                 int n = PublicObject.allMusicList.size();
                 for(int i = 0;i < n;i++){
@@ -244,9 +242,9 @@ public class Player implements IPlay {
                 return false;
             }
             return true;
-        }else if(flag == Player.SINGLELOOP){
+        }else if(flag == Player.SINGLE_LOOP){
             playCurrentSong();
-        }else if(flag == Player.RANDLOOP || flag == Player.QUICKRANDLOOP){
+        }else if(flag == Player.RAND_LOOP || flag == Player.QUICK_RAND_LOOP){
             int positionRandom = (int)(Math.random() * PublicObject.musicList.size());
             play(positionRandom,PublicObject.musicList.get(positionRandom).getPath(),false);
         }

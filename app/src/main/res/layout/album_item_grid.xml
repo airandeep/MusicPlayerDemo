@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/album_info"
+    android:layout_width="wrap_content"
+    android:layout_height="210dp"
+    android:background="@drawable/recycler_item_selector"
+    android:orientation="vertical"
+    android:layout_margin="2.0dip">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="170dp">
+        <com.example.a11084919.musicplayerdemo.controlsOverride.SquareImageView
+            android:id="@+id/album_show"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/picture_default"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="5dp">
+
+        <com.example.a11084919.musicplayerdemo.controlsOverride.MarqueeTextView
+            android:id="@+id/album_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="依然范特西"
+            android:textSize="15dp"
+            android:textColor="#545454"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/music_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2首"/>
+            <TextView
+                android:layout_marginLeft="30dp"
+                android:id="@+id/music_artist"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="周杰伦"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
+<!--</FrameLayout>-->
