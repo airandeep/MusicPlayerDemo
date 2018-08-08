@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import org.litepal.crud.DataSupport;
 
@@ -35,6 +36,11 @@ import java.util.List;
 public class ScanningActivity extends BaseActivity {
 
     private static String TAG = "ScanningActivity";
+
+    //微信
+    private static final String APP_ID = "wx54812e861d61118b";
+
+
     private String strShow;
 
     private Button btnBack;
@@ -76,6 +82,8 @@ public class ScanningActivity extends BaseActivity {
         setContentView(R.layout.activity_scanning);
         initView();
 
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "music";
             String channelName = "音乐通知";
@@ -95,6 +103,9 @@ public class ScanningActivity extends BaseActivity {
                 finish();
                 return;
             }else{
+                //将自己ID注册到微信终端
+                regToWx();
+
                 tempMusicList = DataSupport.findAll(Music.class);
                 //存储专辑静态变量
                 if(tempMusicList.size()>0){
@@ -221,6 +232,11 @@ public class ScanningActivity extends BaseActivity {
             }
         }
 
+    }
+
+    private void regToWx(){
+        PublicObject.api = WXAPIFactory.createWXAPI(this,APP_ID,true);
+        PublicObject.api.registerApp(APP_ID);
     }
 
     //只获取特定文件夹和根目录下文件的文件名，专辑图片，文件信息

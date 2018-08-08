@@ -314,7 +314,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
                 Manifest.permission.INTERNET
         };
 
-        ArrayList<String> toApplyList = new ArrayList<String>();
+        ArrayList<String> toApplyList = new ArrayList();
 
         for (String perm : permissions) {
             if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {

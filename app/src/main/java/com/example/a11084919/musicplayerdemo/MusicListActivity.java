@@ -217,22 +217,31 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                     }
                     msg.setText("确定要删除选中的"+num+"首歌曲么?");
 
-                    cancel.setOnClickListener(new View.OnClickListener(){
-                        public void onClick(View v){
-                            dialog.dismiss();
-                        }
-                    });
+                    cancel.setOnClickListener((v)->{dialog.dismiss();});
 
                     sure.setOnClickListener(new View.OnClickListener(){
                         public void onClick(View view){
-                            for(int i = musicAdapterRecycle.getMyMusicList().size()-1;i>=0;i--){
+//                            for(int i = musicAdapterRecycle.getMyMusicList().size()-1;i>=0;i--){
+//                                Music music = musicAdapterRecycle.getMyMusicList().get(i);
+//                                if(music.isSelect()){
+//                                    musicAdapterRecycle.getMyMusicList().remove(music);
+//                                    Functivity.deleteFile(music.getPath());
+//                                    DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
+//                                }
+//                            }
+
+                            int i = 0;
+                            while (i < musicAdapterRecycle.getMyMusicList().size()){
                                 Music music = musicAdapterRecycle.getMyMusicList().get(i);
                                 if(music.isSelect()){
-                                    musicAdapterRecycle.getMyMusicList().remove(music);
+                                    musicAdapterRecycle.getMyMusicList().remove(i);
                                     Functivity.deleteFile(music.getPath());
                                     DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
+                                }else{
+                                    i++;
                                 }
                             }
+
                             Functivity.initAlbumListAndMusicMap(PublicObject.musicList);
                             musicAdapterRecycle.notifyDataSetChanged();
 

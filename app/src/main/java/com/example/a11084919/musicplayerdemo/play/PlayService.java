@@ -38,7 +38,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private static final String ACTION_STOP_SERVICE = "airan.music.ACTION.STOP_SERVICE";
 
     private static String TAG = "PlayService";
-    private Player mPlayer;
+    private static Player mPlayer;
 
     //注:千万不要在Service类中定义这2歌类的引用，否则会导致通知和通知栏显示的实例化对象由于强引用无法释放资源造成内存泄漏
     //private RemoteViews mContentViewSmall
@@ -58,7 +58,11 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
     public PlayService() {}
 
-    Handler mHandler = new Handler(){
+
+    public static MyHandler mHandler = new MyHandler();
+
+    static public class MyHandler extends Handler{
+        @Override
         public void handleMessage(Message msg){
             switch (msg.what){
                 case 0:
@@ -68,7 +72,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                     break;
             }
         }
-    };
+    }
 
 //    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 //        @Override
@@ -78,6 +82,9 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 //    };
 
     public void onCreate() {
+        String a = "dsfdg";
+        a.contains("df");
+
         super.onCreate();
         manager = (NotificationManager)getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
         mPlayer = Player.getInstance();

@@ -25,11 +25,15 @@ import com.example.a11084919.musicplayerdemo.AlbumMusicListActivity;
 import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
+import com.example.a11084919.musicplayerdemo.ScanningActivity;
 import com.example.a11084919.musicplayerdemo.general.Functivity;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;
 import com.example.a11084919.musicplayerdemo.play.PlayService;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 
 import org.litepal.crud.DataSupport;
 
@@ -211,10 +215,40 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                Music music = mMusicList.get(position);
                 switch (item.getItemId()) {
+                    case R.id.add_item:{
+                        List<FavoriteMusic> musics = DataSupport.where("path = ?",music.getPath()).find(FavoriteMusic.class);
+                        if(musics.size()>0){
+                            Toast.makeText(mContext,"当前喜爱歌曲已存在",Toast.LENGTH_SHORT).show();
+                        }else{
+                            FavoriteMusic favoriteMusic = new FavoriteMusic(music);
+                            favoriteMusic.save();
+                            Toast.makeText(mContext,"当前喜爱歌曲已添加",Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    }
+                    //微信朋友圈
+                    case R.id.share_item:{
+                        String musicUrl = "www.baidu.com";
+                        String musicTitle = music.getTitle();
+                        String description = music.getArtist();
+                        Bitmap bitmap = Functivity.getCover(music.getPic());
+                        Functivity.shareMusic(0,mContext,musicUrl,musicTitle,description,bitmap);
+
+                        break;
+                    }
+                    //微信好友
+                    case R.id.share_item1:{
+                        String musicUrl = "www.baidu.com";
+                        String musicTitle = music.getTitle();
+                        String description = music.getArtist();
+                        Bitmap bitmap = Functivity.getCover(music.getPic());
+                        Functivity.shareMusic(1,mContext,musicUrl,musicTitle,description,bitmap);
+                        break;
+                    }
                     case R.id.delete_item:{
                         if(mMusicList == PublicObject.allMusicList){
-                            Music music = mMusicList.get(position);
                             mMusicList.remove(position);
                             //移除适配器中的内容即使notifyDataSetChanged刷新一下
                             Functivity.deleteFile(music.getPath());
@@ -228,18 +262,6 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                         }
                         break;
                     }
-                    case R.id.add_item:{
-                        Music music = mMusicList.get(position);
-                        List<FavoriteMusic> musics = DataSupport.where("path = ?",music.getPath()).find(FavoriteMusic.class);
-                        if(musics.size()>0){
-                            Toast.makeText(mContext,"当前喜爱歌曲已存在",Toast.LENGTH_SHORT).show();
-                        }else{
-                            FavoriteMusic favoriteMusic = new FavoriteMusic(music);
-                            favoriteMusic.save();
-                            Toast.makeText(mContext,"当前喜爱歌曲已添加",Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
                     default:{
                         break;
                     }
@@ -249,4 +271,10 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         });
         popupMenu.show();
     }
+
+    private String buildTransaction(final String type) {
+        return (type ==null) ?String.valueOf(System.currentTimeMillis()) :type+System.currentTimeMillis();
+    }
+
+
 }

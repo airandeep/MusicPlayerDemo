@@ -2,6 +2,7 @@ package com.example.a11084919.musicplayerdemo.general;
 
 import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,5 +25,6 @@ public class PublicObject {
     public static boolean indexFlag = false;
 
     public static boolean threadFlag = true;
-    //public static int playingIndex;
+    //微信
+    public static IWXAPI api;
 }
