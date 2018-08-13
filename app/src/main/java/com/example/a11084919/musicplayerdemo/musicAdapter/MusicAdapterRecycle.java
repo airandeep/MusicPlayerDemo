@@ -26,7 +26,7 @@ import com.example.a11084919.musicplayerdemo.MusicListActivity;
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
 import com.example.a11084919.musicplayerdemo.ScanningActivity;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;
@@ -38,6 +38,8 @@ import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 import org.litepal.crud.DataSupport;
 
 import java.util.List;
+
+import static com.example.a11084919.musicplayerdemo.MusicListActivity.STATE_MANAGE;
 
 public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycle.ViewHolder> {
 
@@ -212,9 +214,7 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
         // menu布局
         popupMenu.inflate(R.menu.menu);
         // menu的item点击事件
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
+        popupMenu.setOnMenuItemClickListener((item)->{
                 Music music = mMusicList.get(position);
                 switch (item.getItemId()) {
                     case R.id.add_item:{
@@ -230,31 +230,31 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                     }
                     //微信朋友圈
                     case R.id.share_item:{
-                        String musicUrl = "www.baidu.com";
+                        String musicUrl = "http://www.51ape.com/pushu/";
                         String musicTitle = music.getTitle();
                         String description = music.getArtist();
-                        Bitmap bitmap = Functivity.getCover(music.getPic());
-                        Functivity.shareMusic(0,mContext,musicUrl,musicTitle,description,bitmap);
+                        Bitmap bitmap = Util.getCover(music.getPic());
+                        Util.shareMusic(0,mContext,musicUrl,musicTitle,description,bitmap);
 
                         break;
                     }
                     //微信好友
                     case R.id.share_item1:{
-                        String musicUrl = "www.baidu.com";
+                        String musicUrl = "http://www.51ape.com/ape/14747.html ";
                         String musicTitle = music.getTitle();
                         String description = music.getArtist();
-                        Bitmap bitmap = Functivity.getCover(music.getPic());
-                        Functivity.shareMusic(1,mContext,musicUrl,musicTitle,description,bitmap);
+                        Bitmap bitmap = Util.getCover(music.getPic());
+                        Util.shareMusic(1,mContext,musicUrl,musicTitle,description,bitmap);
                         break;
                     }
                     case R.id.delete_item:{
                         if(mMusicList == PublicObject.allMusicList){
                             mMusicList.remove(position);
                             //移除适配器中的内容即使notifyDataSetChanged刷新一下
-                            Functivity.deleteFile(music.getPath());
+                            Util.deleteFile(music.getPath());
                             DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
 
-                            Functivity.initAlbumListAndMusicMap(mMusicList);
+                            Util.initAlbumListAndMusicMap(mMusicList);
                             notifyDataSetChanged();
                             Toast.makeText(mContext,"歌曲" + music.getName() + "删除成功",Toast.LENGTH_SHORT).show();
                         }else{
@@ -267,7 +267,6 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                     }
                 }
                 return false;
-            }
         });
         popupMenu.show();
     }

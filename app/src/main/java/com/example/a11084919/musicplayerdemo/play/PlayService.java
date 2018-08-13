@@ -21,7 +21,7 @@ import android.widget.RemoteViews;
 
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
@@ -364,7 +364,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private void updateRemoteViews(RemoteViews remoteView) {
         remoteView.setImageViewResource(R.id.image_view_play_toggle, isPlaying()
                 ? R.drawable.ic_remote_view_pause : R.drawable.ic_remote_view_play);
-        Bitmap bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        Bitmap bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             remoteView.setImageViewResource(R.id.image_view_album,R.drawable.picture_default);
         }else{

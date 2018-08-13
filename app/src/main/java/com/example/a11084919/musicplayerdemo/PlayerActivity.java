@@ -31,7 +31,7 @@ import com.baidu.speech.EventListener;
 import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
 import com.baidu.speech.asr.SpeechConstant;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.play.IPlay;
 import com.example.a11084919.musicplayerdemo.play.PlayService;
@@ -450,7 +450,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             imgShow.clearAnimation();
         }
 
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
         }else{
@@ -533,21 +533,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
 
-        txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
-        txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
-
-        //position = mPlayer.getPosition();
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
-        if(bmpMp3 == null){
-            imgShow.setImageResource(R.drawable.picture_default);
-        }else{
-            imgShow.setImageBitmap(bmpMp3);
-        }
-
-        //修改当前歌曲显示
-        int maxTime = mPlayer.getDuration()/1000;
-        String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
-        txtMaxTime.setText(str);
+        upInfo();
     }
     public void onSwitchNext(){
         imgShow.clearAnimation();
@@ -557,22 +543,7 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         btnPause.setVisibility(View.VISIBLE);
         btnPlay.setVisibility(View.GONE);
 
-        txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
-        txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
-
-        //position = mPlayer.getPosition();
-
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
-        if(bmpMp3 == null){
-            imgShow.setImageResource(R.drawable.picture_default);
-        }else{
-            imgShow.setImageBitmap(bmpMp3);
-        }
-
-        //修改当前歌曲显示
-        int maxTime = mPlayer.getDuration()/1000;
-        String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
-        txtMaxTime.setText(str);
+        upInfo();
     }
     public void onPlayStatusChanged() {
         imgShow.clearAnimation();
@@ -586,13 +557,16 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
             btnPlay.setVisibility(View.VISIBLE);
         }
 
+        upInfo();
 
+    }
+
+    private void upInfo(){
         txtMusicName.setText(mPlayer.getCurrentMusic().getTitle());
         txtMusicArtist.setText(mPlayer.getCurrentMusic().getArtist());
 
-       // position = mPlayer.getPosition();
 
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
         }else{
@@ -603,7 +577,6 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
         int maxTime = mPlayer.getDuration()/1000;
         String str = String.format("%02d:%02d", maxTime / 60 % 60, maxTime % 60);
         txtMaxTime.setText(str);
-
     }
 
     public void onUpdateProgressBar(){
