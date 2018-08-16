@@ -240,11 +240,20 @@ public class MusicAdapterRecycle extends RecyclerView.Adapter<MusicAdapterRecycl
                     }
                     //微信好友
                     case R.id.share_item1:{
-                        String musicUrl = "http://www.51ape.com/ape/14747.html ";
+                        String musicUrl = "http://www.51ape.com/ape/14747.html";
                         String musicTitle = music.getTitle();
                         String description = music.getArtist();
                         Bitmap bitmap = Util.getCover(music.getPic());
                         Util.shareMusic(1,mContext,musicUrl,musicTitle,description,bitmap);
+                        break;
+                    }
+                    //微信收藏
+                    case R.id.share_item2:{
+                        String musicUrl = "http://www.51ape.com/ape/14747.html";
+                        String musicTitle = music.getTitle();
+                        String description = music.getArtist();
+                        Bitmap bitmap = Util.getCover(music.getPic());
+                        Util.shareMusic(2,mContext,musicUrl,musicTitle,description,bitmap);
                         break;
                     }
                     case R.id.delete_item:{

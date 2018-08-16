@@ -199,8 +199,6 @@ public class PlayerActivity extends BaseActivity implements IPlay.Callback,Event
                 btnPause.setVisibility(View.GONE);
                 btnPlay.setVisibility(View.VISIBLE);
                 imgShow.clearAnimation();
-
-
             }
         });
 

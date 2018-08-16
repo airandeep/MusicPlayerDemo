@@ -11,7 +11,7 @@
         android:layout_height="50dp"
         android:gravity="center_vertical">
         <LinearLayout
-            android:id="@+id/bottom_nav_info"
+            android:id="@+id/bottom_info"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -67,10 +67,11 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/btn_next"/>
     </LinearLayout>
+
     <ProgressBar
         android:id="@+id/music_progress"
-        android:max="200"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:max="200" />
 </LinearLayout>

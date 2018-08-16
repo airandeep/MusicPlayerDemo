@@ -4,14 +4,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -41,7 +37,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private static Player mPlayer;
 
     //注:千万不要在Service类中定义这2歌类的引用，否则会导致通知和通知栏显示的实例化对象由于强引用无法释放资源造成内存泄漏
-    //private RemoteViews mContentViewSmall
+    //private RemoteViews mBigContentView;
+    //private RemoteViews mContentView;
     //private Notification notification
 
     private boolean cycleFlag;
@@ -312,8 +309,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                 .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked//当点击通知跳到那首歌曲
-                .setCustomBigContentView(getContentView())
-                .setCustomContentView(getSmallContentView())
+                .setCustomBigContentView(getBigContentView())
+                .setCustomContentView(getContentView())
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
                 .build();
@@ -330,18 +327,20 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
 
     //通知栏绑定UI
-    private RemoteViews getContentView() {
-        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player);
-        setUpRemoteView(mContentViewSmall,1);
-        updateRemoteViews(mContentViewSmall);
-        return mContentViewSmall;
+    private RemoteViews getBigContentView() {
+
+        RemoteViews mBigContentView = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_big);
+
+        setUpRemoteView(mBigContentView,1);
+        updateRemoteViews(mBigContentView);
+        return mBigContentView;
     }
 
-    private RemoteViews getSmallContentView(){
-        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_small);
-        setUpRemoteView(mContentViewSmall,2);
-        updateRemoteViews(mContentViewSmall);
-        return mContentViewSmall;
+    private RemoteViews getContentView(){
+        RemoteViews mContentView = new RemoteViews(getPackageName(), R.layout.remote_view_music_player);
+        setUpRemoteView(mContentView,2);
+        updateRemoteViews(mContentView);
+        return mContentView;
     }
 
 

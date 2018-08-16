@@ -68,7 +68,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
     private TextView navTxtHeadPlaySinger;
 
     private FrameLayout bottomView;
-    private LinearLayout bottomNavInfo;
+    private LinearLayout bottomInfo;
     private ImageView bottomImgShow;
     private ImageView bottomImgControl;
     private ImageView bottomImgNext;
@@ -256,7 +256,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
             }
         });
 
-        bottomNavInfo.setOnClickListener(new View.OnClickListener() {
+        bottomInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(PublicObject.threadFlag){
@@ -323,7 +323,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         navTxtHeadPlayInfo = headerView.findViewById(R.id.nav_txt_head_play_info);
         navTxtHeadPlaySinger = headerView.findViewById(R.id.nav_txt_head_play_singer);
 
-        bottomNavInfo = findViewById(R.id.bottom_nav_info);
+        bottomInfo = findViewById(R.id.bottom_info);
         bottomImgShow = findViewById(R.id.bottom_img_show);
         bottomTxtPlayInfo = findViewById(R.id.bottom_txt_play_info);
         bottomTxtPlaySinger = findViewById(R.id.bottom_txt_play_singer);
@@ -344,7 +344,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 switch(item.getItemId()){
                     case R.id.nav_play_list:{
                         if(adapterNow != ADAPTER_MUSIC){
-                            //尽管延迟0.5秒执行run中方法降低了反应速度，但是可以防止侧滑掉帧数
+                            //尽管延迟0.3秒执行run中方法降低了反应速度，但是可以防止侧滑掉帧数
                             navDrawerRunnable.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {

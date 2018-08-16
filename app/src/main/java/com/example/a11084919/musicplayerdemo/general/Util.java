@@ -112,6 +112,8 @@ public class Util {
             req.scene = SendMessageToWX.Req.WXSceneTimeline;
         }else if(type == 1){
             req.scene = SendMessageToWX.Req.WXSceneSession;
+        }else if(type == 2){
+            req.scene = SendMessageToWX.Req.WXSceneFavorite;
         }
 
 
@@ -129,7 +131,7 @@ public class Util {
         return baos.toByteArray();
     }
 
-    public static byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
+    private static byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
         int i;
         int j;
         if (bmp.getHeight() > bmp.getWidth()) {
