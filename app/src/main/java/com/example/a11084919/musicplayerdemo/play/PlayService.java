@@ -12,8 +12,10 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
+
 
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
@@ -52,6 +54,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
             return PlayService.this;
         }
     }
+
 
     public PlayService() {}
 
