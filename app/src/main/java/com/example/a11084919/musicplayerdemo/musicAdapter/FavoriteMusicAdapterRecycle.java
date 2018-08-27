@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;

@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.example.a11084919.musicplayerdemo.AlbumMusicListActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
@@ -96,7 +96,7 @@ public class AlbumAdapterRecycle extends RecyclerView.Adapter<AlbumAdapterRecycl
         @Override
         protected Bitmap doInBackground(Music... music) {
             mMusic = music[0];
-            Bitmap bitmap = Functivity.getCover(mMusic.getPic());
+            Bitmap bitmap = Util.getCover(mMusic.getPic());
             return bitmap;
         }
 

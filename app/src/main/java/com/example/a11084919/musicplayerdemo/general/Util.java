@@ -20,7 +20,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Functivity {
+public class Util {
+
+    public static Util sInstance;
+
+    public Util getInstance(){
+        if(sInstance == null){
+            synchronized (Util.class){
+                if(sInstance == null){
+                    sInstance = new Util();
+                }
+            }
+        }
+        return sInstance;
+    }
+
+
     public static boolean deleteFile(String filePath){
         File file = new File(filePath);
         if(file.isFile() && file.exists()){
@@ -112,6 +127,8 @@ public class Functivity {
             req.scene = SendMessageToWX.Req.WXSceneTimeline;
         }else if(type == 1){
             req.scene = SendMessageToWX.Req.WXSceneSession;
+        }else if(type == 2){
+            req.scene = SendMessageToWX.Req.WXSceneFavorite;
         }
 
 
@@ -129,7 +146,7 @@ public class Functivity {
         return baos.toByteArray();
     }
 
-    public static byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
+    private static byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
         int i;
         int j;
         if (bmp.getHeight() > bmp.getWidth()) {

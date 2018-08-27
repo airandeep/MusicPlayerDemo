@@ -8,26 +8,21 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.baidu.speech.EventListener;
 import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
 import com.baidu.speech.asr.SpeechConstant;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
-import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.model.Msg;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MsgAdapter;
 import com.example.a11084919.musicplayerdemo.play.IPlay;
@@ -145,7 +140,7 @@ public class VoiceRecognitionActivity extends AppCompatActivity implements Event
         btnVoiceControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(Functivity.checkNetworkState(VoiceRecognitionActivity.this)){
+                if(Util.checkNetworkState(VoiceRecognitionActivity.this)){
                     if(isUseVoice){
                         String strFlag = btnVoiceControl.getText().toString();
                         if(strFlag.equals("开始识别")){

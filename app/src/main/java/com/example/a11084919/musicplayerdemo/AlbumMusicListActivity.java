@@ -3,7 +3,6 @@ package com.example.a11084919.musicplayerdemo;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,9 +11,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
-import com.example.a11084919.musicplayerdemo.musicAdapter.AlbumAdapterRecycle;
 import com.example.a11084919.musicplayerdemo.musicAdapter.MusicAdapterRecycle;
 
 public class AlbumMusicListActivity extends BaseActivity {
@@ -43,7 +41,7 @@ public class AlbumMusicListActivity extends BaseActivity {
         PublicObject.albumMusicList = PublicObject.musicMap.get(strAlbumName);
 
         txtAlbumName.setText(strAlbumName);
-        bmpMp3 = Functivity.getCover(PublicObject.albumMusicList.get(0).getPic());
+        bmpMp3 = Util.getCover(PublicObject.albumMusicList.get(0).getPic());
         if(bmpMp3 == null){
             imgShow.setImageResource(R.drawable.picture_default);
         }else{

@@ -10,6 +10,9 @@
         android:id="@+id/share_item1"
         android:title="微信好友"/>
     <item
+        android:id="@+id/share_item2"
+        android:title="微信收藏"/>
+    <item
         android:id="@+id/delete_item"
         android:title="删除"/>
     <item

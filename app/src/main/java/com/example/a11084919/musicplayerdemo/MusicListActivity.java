@@ -32,7 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.FavoriteMusic;
 import com.example.a11084919.musicplayerdemo.model.Music;
@@ -68,7 +68,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
     private TextView navTxtHeadPlaySinger;
 
     private FrameLayout bottomView;
-    private LinearLayout bottomNavInfo;
+    private LinearLayout bottomInfo;
     private ImageView bottomImgShow;
     private ImageView bottomImgControl;
     private ImageView bottomImgNext;
@@ -235,14 +235,14 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                                 Music music = musicAdapterRecycle.getMyMusicList().get(i);
                                 if(music.isSelect()){
                                     musicAdapterRecycle.getMyMusicList().remove(i);
-                                    Functivity.deleteFile(music.getPath());
+                                    Util.deleteFile(music.getPath());
                                     DataSupport.deleteAll(Music.class,"path = ?",music.getPath());
                                 }else{
                                     i++;
                                 }
                             }
 
-                            Functivity.initAlbumListAndMusicMap(PublicObject.musicList);
+                            Util.initAlbumListAndMusicMap(PublicObject.musicList);
                             musicAdapterRecycle.notifyDataSetChanged();
 
                             dialog.dismiss();
@@ -256,7 +256,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
             }
         });
 
-        bottomNavInfo.setOnClickListener(new View.OnClickListener() {
+        bottomInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(PublicObject.threadFlag){
@@ -323,7 +323,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         navTxtHeadPlayInfo = headerView.findViewById(R.id.nav_txt_head_play_info);
         navTxtHeadPlaySinger = headerView.findViewById(R.id.nav_txt_head_play_singer);
 
-        bottomNavInfo = findViewById(R.id.bottom_nav_info);
+        bottomInfo = findViewById(R.id.bottom_info);
         bottomImgShow = findViewById(R.id.bottom_img_show);
         bottomTxtPlayInfo = findViewById(R.id.bottom_txt_play_info);
         bottomTxtPlaySinger = findViewById(R.id.bottom_txt_play_singer);
@@ -344,22 +344,23 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 switch(item.getItemId()){
                     case R.id.nav_play_list:{
                         if(adapterNow != ADAPTER_MUSIC){
-                            //尽管延迟0.5秒执行run中方法降低了反应速度，但是可以防止侧滑掉帧数
+                            //尽管延迟0.3秒执行run中方法降低了反应速度，但是可以防止侧滑掉帧数
                             navDrawerRunnable.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     adapterNow = ADAPTER_MUSIC;
-                                    recyclerView.setLayoutManager(linearLayoutManager);
-                                    recyclerView.setAdapter(musicAdapterRecycle);
-
                                     actionBar.setTitle("播放列表");
                                     if(stateNow == STATE_MANAGE){
+                                        musicAdapterRecycle.setEditMode(1);
                                         bottomView.setVisibility(View.GONE);
                                         linearBottomButtons.setVisibility(View.VISIBLE);
                                     }else{
+                                        musicAdapterRecycle.setEditMode(0);
                                         bottomView.setVisibility(View.VISIBLE);
                                         linearBottomButtons.setVisibility(View.GONE);
                                     }
+                                    recyclerView.setLayoutManager(linearLayoutManager);
+                                    recyclerView.setAdapter(musicAdapterRecycle);
                                 }
                             }, 300);
 
@@ -379,9 +380,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
 
                                     actionBar.setTitle("喜欢列表");
                                     if(stateNow == STATE_MANAGE){
-                                        bottomView.setVisibility(View.GONE);
-                                        linearBottomButtons.setVisibility(View.VISIBLE);
-                                    }else{
+                                        stateNow = STATE_PLAY_ENABLE;
                                         bottomView.setVisibility(View.VISIBLE);
                                         linearBottomButtons.setVisibility(View.GONE);
                                     }
@@ -480,7 +479,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
                 break;
             }
             case R.id.settings:{
-                if(adapterNow != ADAPTER_ALBUM){
+                if(adapterNow == ADAPTER_MUSIC){
                     if(stateNow == STATE_PLAY_ENABLE){
                         bottomView.setVisibility(View.GONE);
                         linearBottomButtons.setVisibility(View.VISIBLE);
@@ -557,7 +556,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         }else{
             bottomImgControl.setImageResource(R.drawable.btn_play);
         }
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             navImgHeadShow.setImageResource(R.drawable.picture_default);
             bottomImgShow.setImageResource(R.drawable.picture_default);
@@ -578,7 +577,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
         navTxtHeadPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
         bottomTxtPlayInfo.setText(mPlayer.getCurrentMusic().getTitle());
         bottomTxtPlaySinger.setText(mPlayer.getCurrentMusic().getArtist());
-        bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
         if(mPlayer.isPlaying()){
             bottomImgControl.setImageResource(R.drawable.btn_pause);
         }else{
@@ -612,7 +611,7 @@ public class MusicListActivity extends BaseActivity implements IPlay.Callback{
             }else{
                 bottomImgControl.setImageResource(R.drawable.btn_play);
             }
-            bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+            bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
             if(bmpMp3 == null){
                 navImgHeadShow.setImageResource(R.drawable.picture_default);
                 bottomImgShow.setImageResource(R.drawable.picture_default);

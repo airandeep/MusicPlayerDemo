@@ -4,24 +4,22 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
+
 import com.example.a11084919.musicplayerdemo.PlayerActivity;
 import com.example.a11084919.musicplayerdemo.R;
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 
@@ -41,7 +39,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private static Player mPlayer;
 
     //注:千万不要在Service类中定义这2歌类的引用，否则会导致通知和通知栏显示的实例化对象由于强引用无法释放资源造成内存泄漏
-    //private RemoteViews mContentViewSmall
+    //private RemoteViews mBigContentView;
+    //private RemoteViews mContentView;
     //private Notification notification
 
     private boolean cycleFlag;
@@ -55,6 +54,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
             return PlayService.this;
         }
     }
+
 
     public PlayService() {}
 
@@ -82,9 +82,6 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 //    };
 
     public void onCreate() {
-        String a = "dsfdg";
-        a.contains("df");
-
         super.onCreate();
         manager = (NotificationManager)getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
         mPlayer = Player.getInstance();
@@ -312,8 +309,8 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
                 .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked//当点击通知跳到那首歌曲
-                .setCustomBigContentView(getContentView())
-                .setCustomContentView(getSmallContentView())
+                .setCustomBigContentView(getBigContentView())
+                .setCustomContentView(getContentView())
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
                 .build();
@@ -330,18 +327,20 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
 
 
     //通知栏绑定UI
-    private RemoteViews getContentView() {
-        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player);
-        setUpRemoteView(mContentViewSmall,1);
-        updateRemoteViews(mContentViewSmall);
-        return mContentViewSmall;
+    private RemoteViews getBigContentView() {
+
+        RemoteViews mBigContentView = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_big);
+
+        setUpRemoteView(mBigContentView,1);
+        updateRemoteViews(mBigContentView);
+        return mBigContentView;
     }
 
-    private RemoteViews getSmallContentView(){
-        RemoteViews mContentViewSmall = new RemoteViews(getPackageName(), R.layout.remote_view_music_player_small);
-        setUpRemoteView(mContentViewSmall,2);
-        updateRemoteViews(mContentViewSmall);
-        return mContentViewSmall;
+    private RemoteViews getContentView(){
+        RemoteViews mContentView = new RemoteViews(getPackageName(), R.layout.remote_view_music_player);
+        setUpRemoteView(mContentView,2);
+        updateRemoteViews(mContentView);
+        return mContentView;
     }
 
 
@@ -364,7 +363,7 @@ public class PlayService extends Service implements IPlay,IPlay.Callback{
     private void updateRemoteViews(RemoteViews remoteView) {
         remoteView.setImageViewResource(R.id.image_view_play_toggle, isPlaying()
                 ? R.drawable.ic_remote_view_pause : R.drawable.ic_remote_view_play);
-        Bitmap bmpMp3 = Functivity.getCover(mPlayer.getCurrentMusic().getPic());
+        Bitmap bmpMp3 = Util.getCover(mPlayer.getCurrentMusic().getPic());
         if(bmpMp3 == null){
             remoteView.setImageViewResource(R.id.image_view_album,R.drawable.picture_default);
         }else{

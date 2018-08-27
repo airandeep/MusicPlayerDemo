@@ -19,7 +19,7 @@ public class PublicObject {
 
     public static List<String> albumList = new ArrayList<>();
     public static Map<String,List<Music>> musicMap = new HashMap<>();
-    //播放歌曲的前一首与后一首
+    //播放歌曲的前一首与后一首位置
     public static int[] musicIndex = new int[2];
 
     public static boolean indexFlag = false;

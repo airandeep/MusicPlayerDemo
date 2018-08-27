@@ -22,7 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.a11084919.musicplayerdemo.general.Functivity;
+import com.example.a11084919.musicplayerdemo.general.Util;
 import com.example.a11084919.musicplayerdemo.general.PublicObject;
 import com.example.a11084919.musicplayerdemo.model.Music;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -38,7 +38,7 @@ public class ScanningActivity extends BaseActivity {
     private static String TAG = "ScanningActivity";
 
     //微信
-    private static final String APP_ID = "wx54812e861d61118b";
+    private static final String APP_ID = "wxa51fa5cc5dc34e87";
 
 
     private String strShow;
@@ -112,7 +112,7 @@ public class ScanningActivity extends BaseActivity {
                     PublicObject.allMusicList = tempMusicList;
                     //将Player中的集合list引用赋值，防止语音直接播放报错
                     PublicObject.musicList = tempMusicList;
-                    Functivity.initAlbumListAndMusicMap(tempMusicList);
+                    Util.initAlbumListAndMusicMap(tempMusicList);
 
                     Intent intent = new Intent(ScanningActivity.this,MusicListActivity.class);
                     startActivity(intent);
@@ -154,7 +154,7 @@ public class ScanningActivity extends BaseActivity {
                                 getMusicFileByMediaStore();
                                 PublicObject.allMusicList = tempMusicList;//静态引用指向另一个集合时，之前指向的集合如果没有引用指向时会自动被系统回收
                                 PublicObject.musicList = tempMusicList;
-                                Functivity.initAlbumListAndMusicMap(tempMusicList);
+                                Util.initAlbumListAndMusicMap(tempMusicList);
                                 mHandler.sendEmptyMessage(1);
                             }
                         }).start();
@@ -193,7 +193,7 @@ public class ScanningActivity extends BaseActivity {
             while (c.moveToNext()) {
                 String path = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));// 路径
                 //有时候会扫描出来不存在的歌曲
-                if(!Functivity.isExists(path)){
+                if(!Util.isExists(path)){
                     continue;
                 }
                 Music music = new Music();
@@ -308,7 +308,7 @@ public class ScanningActivity extends BaseActivity {
                             getMusicFileByMediaStore();
                             PublicObject.allMusicList = tempMusicList;
                             PublicObject.musicList = tempMusicList;
-                            Functivity.initAlbumListAndMusicMap(tempMusicList);
+                            Util.initAlbumListAndMusicMap(tempMusicList);
                             mHandler.sendEmptyMessage(1);
                         }
                     }).start();
